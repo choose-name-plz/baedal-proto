@@ -1,7 +1,11 @@
 package com.nameplz.baedal.domain.product.domain;
 
 import com.nameplz.baedal.domain.model.BaseEntity;
+import com.nameplz.baedal.domain.orderproduct.domain.OrderProduct;
+import com.nameplz.baedal.domain.store.domain.Store;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +37,13 @@ public class Product extends BaseEntity {
     @Column(name = "is_public")
     private boolean isPublic;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
+    private Store store;
+
+    @OneToMany(mappedBy = "product")
+    private List<OrderProduct> orderProductList = new ArrayList<>();
+
     public static Product product(String name, String description, Integer price, String image) {
         Product product = new Product();
         product.name = name;
@@ -43,4 +54,10 @@ public class Product extends BaseEntity {
         return product;
     }
 
+    /**
+     * 상품의 가게 설정
+     */
+    public void setStoreInfo(Store store) {
+        this.store = store;
+    }
 }
