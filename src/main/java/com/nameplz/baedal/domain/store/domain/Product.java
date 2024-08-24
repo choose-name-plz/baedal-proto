@@ -1,11 +1,7 @@
-package com.nameplz.baedal.domain.product.domain;
+package com.nameplz.baedal.domain.store.domain;
 
 import com.nameplz.baedal.domain.model.BaseEntity;
-import com.nameplz.baedal.domain.orderproduct.domain.OrderProduct;
-import com.nameplz.baedal.domain.store.domain.Store;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,8 +1,7 @@
-package com.nameplz.baedal.domain.orderproduct.domain;
+package com.nameplz.baedal.domain.order.domain;
 
 import com.nameplz.baedal.domain.model.BaseEntity;
-import com.nameplz.baedal.domain.order.domain.Order;
-import com.nameplz.baedal.domain.product.domain.Product;
+import com.nameplz.baedal.domain.store.domain.Product;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,17 +11,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "p_order_product")
+@Table(name = "p_orderline")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class OrderProduct extends BaseEntity {
+public class OrderLine extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -41,10 +39,10 @@ public class OrderProduct extends BaseEntity {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    public static OrderProduct createOrderProduct(
+    public static OrderLine createOrderProduct(
         Integer quantity, Integer amount, Product product, Order order) {
 
-        OrderProduct orderProduct = new OrderProduct();
+        OrderLine orderProduct = new OrderLine();
         orderProduct.quantity = quantity;
         orderProduct.amount = amount;
         // 외부 연결점

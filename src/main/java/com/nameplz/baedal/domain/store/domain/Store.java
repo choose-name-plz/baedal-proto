@@ -2,7 +2,6 @@ package com.nameplz.baedal.domain.store.domain;
 
 import com.nameplz.baedal.domain.category.domain.Category;
 import com.nameplz.baedal.domain.model.BaseEntity;
-import com.nameplz.baedal.domain.product.domain.Product;
 import com.nameplz.baedal.domain.review.domain.Review;
 import com.nameplz.baedal.domain.territory.domain.Territory;
 import com.nameplz.baedal.domain.user.domain.User;
