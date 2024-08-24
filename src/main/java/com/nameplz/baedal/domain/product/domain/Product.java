@@ -41,23 +41,16 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
-    @OneToMany(mappedBy = "product")
-    private List<OrderProduct> orderProductList = new ArrayList<>();
-
-    public static Product product(String name, String description, Integer price, String image) {
+    public static Product product(String name, String description, Integer price, String image, Store store) {
         Product product = new Product();
         product.name = name;
         product.description = description;
         product.price = price;
         product.image = image;
+        product.store = store;
+
+        // 기본 값
         product.isPublic = true;
         return product;
-    }
-
-    /**
-     * 상품의 가게 설정
-     */
-    public void setStoreInfo(Store store) {
-        this.store = store;
     }
 }

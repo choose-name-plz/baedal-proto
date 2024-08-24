@@ -77,7 +77,6 @@ public class Store extends BaseEntity {
      */
     public void addProduct(Product product) {
         this.productList.add(product);
-        product.setStoreInfo(this);
     }
 
 }
