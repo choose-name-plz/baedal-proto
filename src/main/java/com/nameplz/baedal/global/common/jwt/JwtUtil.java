@@ -1,6 +1,6 @@
-package com.sparta.spring_auth.jwt;
+package com.nameplz.baedal.global.common.jwt;
 
-import com.sparta.spring_auth.entity.UserRoleEnum;
+import com.nameplz.baedal.domain.user.domain.UserRole;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -56,7 +56,7 @@ public class JwtUtil {
     ////////////////////////////////////////////////////////////////////
 
     // 1. JWT 토큰 생성 (1) JWT 토큰을 헤더에 달아 보낼수도 있고 (2) 쿠키객체에 담아 줄 수도 있다 - 프론트와 조율해야함
-    public String createToken(String username, UserRoleEnum role) {
+    public String createToken(String username, UserRole role) {
         Date date = new Date();
 
         return BEARER_PREFIX +
@@ -96,7 +96,7 @@ public class JwtUtil {
     // 4. JWT 검증
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
             logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
@@ -112,7 +112,7 @@ public class JwtUtil {
 
     // 5. JWT에서 사용자 정보 가져오기
     public Claims getUserInfoFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 
     // HttpServletRequest 에서 Cookie Value : JWT 가져오기

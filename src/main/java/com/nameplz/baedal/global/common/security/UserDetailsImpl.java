@@ -1,16 +1,15 @@
 package com.nameplz.baedal.global.common.security;
 
-import com.nameplz.baedal.domain.user.domain.repository.UserRepository;
+import com.nameplz.baedal.domain.user.domain.User;
+import com.nameplz.baedal.domain.user.domain.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class UserDetailsImpl implements UserDetailsService {
+public class UserDetailsImpl implements UserDetails {
 
     private final User user;
 
@@ -34,7 +33,7 @@ public class UserDetailsImpl implements UserDetailsService {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        UserRoleEnum role = user.getRole();
+        UserRole role = user.getRole();
         String authority = role.getAuthority();
 
         SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
