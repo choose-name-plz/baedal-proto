@@ -6,5 +6,8 @@ import lombok.Getter;
 @Getter
 @Embeddable
 public enum UserRole {
-    CUSTOMER, OWNER, MASTER
+    CUSTOMER,
+    OWNER,
+    MANAGER,
+    MASTER
 }
