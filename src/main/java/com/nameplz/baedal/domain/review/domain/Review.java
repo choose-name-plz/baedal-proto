@@ -32,13 +32,14 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
-    public static Review create(String content, Integer rating) {
+    public static Review create(String content, Integer rating, Store store) {
 
         Review review = new Review();
 
         review.content = content;
         review.rating = rating;
         review.isReported = false;
+        review.store = store;
 
         return review;
     }
