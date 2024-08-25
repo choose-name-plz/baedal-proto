@@ -1,4 +1,4 @@
-package com.nameplz.baedal.domain.product.domain;
+package com.nameplz.baedal.domain.store.domain;
 
 import com.nameplz.baedal.domain.model.BaseEntity;
 import jakarta.persistence.*;
@@ -33,14 +33,20 @@ public class Product extends BaseEntity {
     @Column(name = "is_public")
     private boolean isPublic;
 
-    public static Product product(String name, String description, Integer price, String image) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
+    private Store store;
+
+    public static Product product(String name, String description, Integer price, String image, Store store) {
         Product product = new Product();
         product.name = name;
         product.description = description;
         product.price = price;
         product.image = image;
+        product.store = store;
+
+        // 기본 값
         product.isPublic = true;
         return product;
     }
-
 }

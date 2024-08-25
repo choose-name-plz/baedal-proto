@@ -1,6 +1,7 @@
 package com.nameplz.baedal.domain.review.domain;
 
 import com.nameplz.baedal.domain.model.BaseEntity;
+import com.nameplz.baedal.domain.store.domain.Store;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,13 +28,18 @@ public class Review extends BaseEntity {
     @Column(name = "is_reported")
     private boolean isReported;
 
-    public static Review create(String content, Integer rating) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
+    private Store store;
+
+    public static Review create(String content, Integer rating, Store store) {
 
         Review review = new Review();
 
         review.content = content;
         review.rating = rating;
         review.isReported = false;
+        review.store = store;
 
         return review;
     }

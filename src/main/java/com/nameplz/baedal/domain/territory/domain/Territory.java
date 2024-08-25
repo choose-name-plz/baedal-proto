@@ -1,7 +1,10 @@
 package com.nameplz.baedal.domain.territory.domain;
 
 import com.nameplz.baedal.domain.model.BaseEntity;
+import com.nameplz.baedal.domain.store.domain.Store;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +23,9 @@ public class Territory extends BaseEntity {
 
     @Column(unique = true, length = 100)
     private String name;
+
+    @OneToMany(mappedBy = "territory")
+    private List<Store> storeList = new ArrayList<>();
 
     public static Territory createTerritory(String name) {
         Territory territory = new Territory();
