@@ -1,5 +1,6 @@
 package com.nameplz.baedal.domain.order.domain;
 
+import com.nameplz.baedal.domain.model.Address;
 import com.nameplz.baedal.domain.model.BaseEntity;
 import com.nameplz.baedal.domain.user.domain.User;
 import jakarta.persistence.*;
@@ -29,6 +30,9 @@ public class Order extends BaseEntity {
     @Column(name = "comment")
     private String comment;
 
+    @Embedded
+    private Address address;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -37,12 +41,13 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderLine> orderLines = new ArrayList<>();
 
-    public static Order create(OrderStatus orderStatus, String comment, User user) {
+    public static Order create(OrderStatus orderStatus, String comment, Address address, User user) {
 
         Order order = new Order();
 
         order.orderStatus = orderStatus;
         order.comment = comment;
+        order.address = address;
         order.user = user;
 
         return order;
