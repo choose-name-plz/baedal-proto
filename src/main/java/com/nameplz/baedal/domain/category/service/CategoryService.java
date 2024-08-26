@@ -8,17 +8,16 @@ import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 @Service
 public class CategoryService {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
