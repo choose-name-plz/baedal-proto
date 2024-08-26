@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
 
@@ -14,7 +13,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class CommonResponse<T> implements Serializable {
 
-    private HttpStatus status; // 응답 상태코드
     private Integer code; // 커스텀 응답 코드
     private String message; // 응답에 대한 설명
     private T data; // 응답에 필요한 데이터
@@ -24,7 +22,6 @@ public class CommonResponse<T> implements Serializable {
      */
     public static CommonResponse<EmptyResponseDto> success() {
         return CommonResponse.<EmptyResponseDto>builder()
-                .status(ResultCase.SUCCESS.getHttpStatus())
                 .code(ResultCase.SUCCESS.getCode())
                 .message(ResultCase.SUCCESS.getMessage())
                 .data(new EmptyResponseDto())
@@ -36,7 +33,6 @@ public class CommonResponse<T> implements Serializable {
      */
     public static <T> CommonResponse<T> success(T data) {
         return CommonResponse.<T>builder()
-                .status(ResultCase.SUCCESS.getHttpStatus())
                 .code(ResultCase.SUCCESS.getCode())
                 .message(ResultCase.SUCCESS.getMessage())
                 .data(data)
@@ -49,7 +45,6 @@ public class CommonResponse<T> implements Serializable {
     public static CommonResponse<EmptyResponseDto> error(ResultCase resultCase) {
 
         return CommonResponse.<EmptyResponseDto>builder()
-                .status(resultCase.getHttpStatus())
                 .code(resultCase.getCode())
                 .message(resultCase.getMessage())
                 .data(new EmptyResponseDto())
@@ -61,7 +56,6 @@ public class CommonResponse<T> implements Serializable {
      */
     public static <T> CommonResponse<T> error(ResultCase resultCase, T data) {
         return CommonResponse.<T>builder()
-                .status(resultCase.getHttpStatus())
                 .code(resultCase.getCode())
                 .message(resultCase.getMessage())
                 .data(data)
