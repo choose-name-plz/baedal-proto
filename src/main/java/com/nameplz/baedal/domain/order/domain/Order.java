@@ -28,6 +28,10 @@ public class Order extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
+    @Column(name = "order_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderType orderType;
+
     @Column(name = "comment")
     private String comment;
 
@@ -46,11 +50,12 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderLine> orderLines = new ArrayList<>();
 
-    public static Order create(OrderStatus orderStatus, String comment, Address address, User user, Store store) {
+    public static Order create(OrderStatus orderStatus, OrderType orderType, String comment, Address address, User user, Store store) {
 
         Order order = new Order();
 
         order.orderStatus = orderStatus;
+        order.orderType = orderType;
         order.comment = comment;
         order.address = address;
         order.user = user;
