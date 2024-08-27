@@ -2,6 +2,7 @@ package com.nameplz.baedal.domain.order.domain;
 
 import com.nameplz.baedal.domain.model.Address;
 import com.nameplz.baedal.domain.model.BaseEntity;
+import com.nameplz.baedal.domain.model.Money;
 import com.nameplz.baedal.domain.store.domain.Store;
 import com.nameplz.baedal.domain.user.domain.User;
 import com.nameplz.baedal.global.common.exception.GlobalException;
@@ -69,6 +70,16 @@ public class Order extends BaseEntity {
         order.store = store;
 
         return order;
+    }
+
+    /**
+     * 주문 총 가격 조회
+     */
+    public Money getTotalOrderPrice() {
+
+        return orderLines.stream()
+                .map(OrderLine::getTotalPrice)
+                .reduce(new Money(0), Money::add);
     }
 
     /**
