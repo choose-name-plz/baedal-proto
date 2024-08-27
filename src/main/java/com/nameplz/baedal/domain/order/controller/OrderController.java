@@ -44,7 +44,6 @@ public class OrderController {
             @PathVariable(name = "userId") String userId,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        log.info("pageable: {}", pageable);
         List<OrderResponseDto> response = orderService.getOrderListByUsername(userId, pageable);
 
         return CommonResponse.success(response);
