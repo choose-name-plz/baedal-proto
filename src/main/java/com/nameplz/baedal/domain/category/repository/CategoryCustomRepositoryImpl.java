@@ -9,11 +9,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
-@Repository
 public class CategoryCustomRepositoryImpl implements CategoryCustomRepository {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
