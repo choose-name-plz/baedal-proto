@@ -20,27 +20,27 @@ public abstract class BaseEntity {
     @CreatedDate
     protected LocalDateTime createdAt;
 
-    @Column(name = "create_by", updatable = false)
+    @Column(name = "created_by", updatable = false)
     @CreatedBy
-    protected String createUser;
+    protected String createdUser;
 
     @Column(name = "updated_at")
     @LastModifiedDate
-    protected LocalDateTime updated_at;
+    protected LocalDateTime updatedAt;
 
-    @Column(name = "update_by")
+    @Column(name = "updated_by")
     @LastModifiedBy
-    protected String updateUser;
+    protected String updatedUser;
 
-    @Column(name = "delete_at")
-    protected LocalDateTime deleteAt;
+    @Column(name = "deleted_at")
+    protected LocalDateTime deletedAt;
 
-    @Column(name = "delete_by")
-    protected String deleteUser;
+    @Column(name = "deleted_by")
+    protected String deletedUser;
 
     public void deleteEntity(String username) {
-        this.deleteAt = LocalDateTime.now();
-        this.deleteUser = username;
+        this.deletedAt = LocalDateTime.now();
+        this.deletedUser = username;
     }
 
 }
