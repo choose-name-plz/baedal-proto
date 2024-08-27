@@ -1,26 +1,21 @@
 package com.nameplz.baedal.domain.order.domain;
 
 import com.nameplz.baedal.domain.model.BaseEntity;
+import com.nameplz.baedal.domain.model.Money;
 import com.nameplz.baedal.domain.store.domain.Product;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import java.util.UUID;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Table(name = "p_orderline")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class OrderLine extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -29,7 +24,8 @@ public class OrderLine extends BaseEntity {
     private Integer quantity;
 
     @Column
-    private Integer amount;
+    @Embedded
+    private Money amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
@@ -39,8 +35,7 @@ public class OrderLine extends BaseEntity {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    public static OrderLine createOrderProduct(
-        Integer quantity, Integer amount, Product product, Order order) {
+    public static OrderLine create(Integer quantity, Money amount, Product product, Order order) {
 
         OrderLine orderProduct = new OrderLine();
         orderProduct.quantity = quantity;
