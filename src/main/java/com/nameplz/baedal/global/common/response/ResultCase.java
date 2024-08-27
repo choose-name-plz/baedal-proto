@@ -24,6 +24,9 @@ public enum ResultCase {
 
     // 존재하지 않는 사용자 404,
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 2000, "유저를 찾을 수 없습니다."),
+
+    NOT_FOUND(HttpStatus.NOT_FOUND, 2002, "존재하지 않는 입력값입니다."),
+
     // 로그인 필요 401
     LOGIN_REQUIRED(HttpStatus.UNAUTHORIZED, 2001, "로그인이 필요합니다.");
 
