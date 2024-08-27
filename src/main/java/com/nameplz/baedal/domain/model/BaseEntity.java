@@ -16,26 +16,26 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
-    @Column(name = "created_at", updatable = false)
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @Column(name = "create_by", updatable = false)
-    @CreatedBy
-    private String createUser;
-
+    @Column(name = "delete_at")
+    protected LocalDateTime deleteAt;
+    @Column(name = "delete_by")
+    protected String deleteUser;
     @Column(name = "updated_at")
     @LastModifiedDate
-    private LocalDateTime updated_at;
-
+    protected LocalDateTime updated_at;
     @Column(name = "update_by")
     @LastModifiedBy
-    private String updateUser;
+    protected String updateUser;
+    @Column(name = "created_at", updatable = false)
+    @CreatedDate
+    protected LocalDateTime createdAt;
+    @Column(name = "create_by", updatable = false)
+    @CreatedBy
+    protected String createUser;
 
-    @Column(name = "delete_at")
-    private LocalDateTime deleteAt;
-
-    @Column(name = "delete_by")
-    private String deleteUser;
+    public void deleteEntity(String username) {
+        this.deleteAt = LocalDateTime.now();
+        this.deleteUser = username;
+    }
 
 }
