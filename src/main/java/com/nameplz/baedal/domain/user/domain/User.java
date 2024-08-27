@@ -2,14 +2,11 @@ package com.nameplz.baedal.domain.user.domain;
 
 import com.nameplz.baedal.domain.model.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
-@Setter
+@ToString
 @Table(name = "p_user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
@@ -34,23 +31,31 @@ public class User extends BaseEntity {
     @Column(name = "is_public")
     private boolean isPublic;
 
-    // lombok 에서 인식 안됨?
-    public void setIsPublic(boolean isPublic) {
-        this.isPublic = isPublic;
-    }
-    public Boolean getIsPublic() {
-        return isPublic;
-    }
-
     public static User create(String username, String password) {
 
         User user = new User();
 
         user.username = username;
         user.password = password;
+        user.role = UserRole.CUSTOMER;
 
         return user;
     }
 
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
+    public void updateEncodedPassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
+    public void updateIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
 
 }

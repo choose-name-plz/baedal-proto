@@ -1,4 +1,4 @@
-package com.nameplz.baedal.global.error;
+package com.nameplz.baedal.global.common.exception;
 
 // 커스텀 예외 클래스 등록
 public class UserNotFoundException extends RuntimeException {

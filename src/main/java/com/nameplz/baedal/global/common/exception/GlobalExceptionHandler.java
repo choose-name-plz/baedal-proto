@@ -5,6 +5,8 @@ import com.nameplz.baedal.global.common.response.EmptyResponseDto;
 import com.nameplz.baedal.global.common.response.ResultCase;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

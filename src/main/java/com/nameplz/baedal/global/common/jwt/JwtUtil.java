@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,7 @@ import java.util.Date;
  * (다른 객체에 의존하지 않고 하나의 모듈로써 동작하는 클래스)
  */
 @Component
+@Slf4j(topic = "JWT 관련 로그")
 public class JwtUtil {
 
     ////////////////////////////// JWT 데이터 /////////////////////////////
@@ -43,9 +45,6 @@ public class JwtUtil {
     private String secretKey;
     private Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-
-    // 로그 설정
-    public static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그");
 
     @PostConstruct // 한 번만 받아와도 되는 값을 사용할때마다 요청을 새로하지 않기 위해
     public void init() {
@@ -72,15 +71,17 @@ public class JwtUtil {
     // 2. jWT를 쿠키에 저장
     public void addJwtToCookie(String token, HttpServletResponse res) {
         try {
+            // TODO : utf-8을 하드코딩 하기보다 StandardCharsets.UTF_8.name() 를 사용하면 좋을 것 같습니다!
             token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
 
             Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token); // Name-Value
             cookie.setPath("/");
+            cookie.setHttpOnly(true); // XSS 방지
 
             // Response 객체에 Cookie 추가
             res.addCookie(cookie);
         } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -89,7 +90,7 @@ public class JwtUtil {
         if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
             return tokenValue.substring(7);
         }
-        logger.error("Not Found Token");
+        log.error("Not Found Token");
         throw new NullPointerException("Not Found Token");
     }
 
@@ -99,13 +100,13 @@ public class JwtUtil {
             Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
-            logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+            log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
-            logger.error("Expired JWT token, 만료된 JWT token 입니다.");
+            log.error("Expired JWT token, 만료된 JWT token 입니다.");
         } catch (UnsupportedJwtException e) {
-            logger.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+            log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
         } catch (IllegalArgumentException e) {
-            logger.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+            log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
         }
         return false;
     }
@@ -118,6 +119,8 @@ public class JwtUtil {
     // HttpServletRequest 에서 Cookie Value : JWT 가져오기
     public String getTokenFromRequest(HttpServletRequest req) {
         Cookie[] cookies = req.getCookies();
+        // TODO : early return 같은 패턴으로 depth를 줄여보는 것도 좋을 것 같습니다!
+        // TODO : 설정 -> tools -> save in action 에서 위의 3개 (코드 서식 다시 지정, import 문 최적화, 코드 재정렬) 체크하고 적용하면 포맷이 알아서 맞춰집니다!
         if(cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
