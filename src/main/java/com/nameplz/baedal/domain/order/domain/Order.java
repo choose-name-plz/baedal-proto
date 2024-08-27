@@ -109,6 +109,6 @@ public class Order extends BaseEntity {
     }
 
     private boolean isOrderCancelable() {
-        return LocalDateTime.now().isAfter(this.getCreatedAt().plusMinutes(ORDER_CANCELABLE_MINUTES));
+        return LocalDateTime.now().isBefore(this.createdAt.plusMinutes(ORDER_CANCELABLE_MINUTES));
     }
 }
