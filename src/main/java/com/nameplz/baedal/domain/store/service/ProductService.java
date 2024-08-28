@@ -164,7 +164,7 @@ public class ProductService {
             list.add(
                 new ProductResponseDto(product.getStore().getId().toString(), product.getName(),
                     product.getDescription(), product.getImage(), product.isPublic(),
-                    product.getPrice()));
+                    product.getPrice(), product.getCreatedAt()));
         }
 
         return list;
@@ -189,7 +189,7 @@ public class ProductService {
             list.add(
                 new ProductResponseDto(product.getStore().getId().toString(), product.getName(),
                     product.getDescription(), product.getImage(), product.isPublic(),
-                    product.getPrice()));
+                    product.getPrice(), product.getCreatedAt()));
         }
         return list;
     }

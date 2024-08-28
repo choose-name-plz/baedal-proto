@@ -9,6 +9,7 @@ import com.nameplz.baedal.domain.store.mapper.StoreMapper;
 import com.nameplz.baedal.domain.store.repository.StoreRepository;
 import com.nameplz.baedal.domain.territory.domain.Territory;
 import com.nameplz.baedal.domain.territory.repository.TerritoryRepository;
+import com.nameplz.baedal.domain.user.domain.User;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class StoreService {
 
     // repository
     private final StoreRepository storeRepository;
-    //    private final UserRepository userRepository;
+    // private final UserRepository userRepository;
     private final TerritoryRepository territoryRepository;
     private final CategoryRepository categoryRepository;
 
@@ -42,8 +43,8 @@ public class StoreService {
     public String createStore(String title, String description, String image, UUID territoryId,
         UUID categoryId, String username) {
 
-//        User user = userRepository.findById(username)
-//            .orElseThrow(() -> new GlobalException(ResultCase.NOT_FOUND));
+        // User user = userRepository.findById(username)
+        //     .orElseThrow(() -> new GlobalException(ResultCase.NOT_FOUND));
 
         Territory territory = territoryRepository.findById(territoryId)
             .orElseThrow(() -> new GlobalException(
@@ -187,7 +188,7 @@ public class StoreService {
             output.add(
                 new StoreResponseDto(store.getId().toString(), store.getTitle(),
                     store.getDescription(), store.getImage(), store.getStatus(),
-                    store.getCategory().getName()));
+                    store.getCategory().getName(), store.getCreatedAt()));
         }
 
         return output;

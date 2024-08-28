@@ -86,7 +86,8 @@ public class ProductController {
         //TODO: 관리자 용
         List<ProductResponseDto> productList = productService.findProductList(pageable);
 
-        return CommonResponse.success(new ProductListResponseDto(productList));
+        return CommonResponse.success(
+            new ProductListResponseDto(pageable.getPageNumber(), productList));
     }
 
     /*

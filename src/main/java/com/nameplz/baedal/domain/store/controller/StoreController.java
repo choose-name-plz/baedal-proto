@@ -176,7 +176,8 @@ public class StoreController {
         List<StoreResponseDto> storeList = storeService.findStoreList(title, categoryId, status,
             pageable);
 
-        return CommonResponse.success(new StoreListResponseDto(storeList));
+        return CommonResponse.success(
+            new StoreListResponseDto(pageable.getPageNumber(), storeList));
     }
 
     /*
@@ -193,7 +194,8 @@ public class StoreController {
         List<ProductResponseDto> productListByStore = productService.findProductListByStore(id,
             hideNotPublic,
             pageable);
-        return CommonResponse.success(new ProductListResponseDto(productListByStore));
+        return CommonResponse.success(
+            new ProductListResponseDto(pageable.getPageNumber(), productListByStore));
     }
 
     // 예외 처리
