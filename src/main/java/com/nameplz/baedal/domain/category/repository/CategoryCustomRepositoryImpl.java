@@ -25,8 +25,7 @@ public class CategoryCustomRepositoryImpl implements CategoryCustomRepository {
         if (StringUtils.hasText(categoryName)) {
             builder.and(category.name.eq(categoryName));
         }
-
-        log.info("검색할 카테 고리 : {}", categoryName);
+        
         return query.select(category)
             .from(category)
             .where(builder)
