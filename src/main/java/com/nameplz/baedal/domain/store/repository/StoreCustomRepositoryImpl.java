@@ -26,9 +26,7 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
     @Override
     public List<Store> findStoreList(String title, UUID categoryId, StoreStatus status,
         Pageable pageable) {
-
-        log.info("페이징 : {}, 오프셋 : {}", pageable.getPageSize(), pageable.getOffset());
-
+        
         BooleanBuilder builder = new BooleanBuilder();
         checkNotDelete(builder);
 
