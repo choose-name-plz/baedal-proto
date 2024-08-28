@@ -64,22 +64,24 @@ public class UserService {
 
     public UserUpdateResponseDto getUserByUsername(String username) {
         User user = userRepository.findById(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         return userMapper.userToUserUpdateResponseDto(user);
     }
 
     @Transactional
     public UserUpdateResponseDto updateUser(String username, UserUpdateRequestDto request) {
         User user = userRepository.findById(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        user.updateNickname(request.nickname());
-        user.updateEmail(request.email());
+        // 비밀번호 인코딩 처리 (엔티티 내에서 처리)
         if (request.password() != null && !request.password().isEmpty()) {
-            user.updateEncodedPassword(passwordEncoder.encode(request.password()));
+            String encodedPassword = passwordEncoder.encode(request.password());
+            // DTO의 비밀번호를 인코딩된 비밀번호로 직접 변경하는 것은 불가능하므로,
+            // 엔티티의 업데이트 메서드에서 비밀번호를 처리하도록 함
+            user.updatePassword(encodedPassword);
         }
-        user.updateIsPublic(request.isPublic());
 
+        user.update(request); // 여기서는 비밀번호 인코딩이 완료된 DTO를 그대로 사용
         userRepository.save(user);
 
         return userMapper.userToUserUpdateResponseDto(user);
@@ -88,11 +90,11 @@ public class UserService {
     @Transactional
     public void deleteUser(String username) {
         User user = userRepository.findById(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         userRepository.delete(user);
     }
 
-    // TODO : ava 17에서는 .collect(Collectors.toList()); 부분을 toList();로 줄여서 사용가능합니다!
+    // TODO : java 17에서는 .collect(Collectors.toList()); 부분을 toList();로 줄여서 사용가능합니다!
     public List<UserUpdateResponseDto> getAllUsers(int page, int size, String sortBy) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortBy).descending());
         return userRepository.findAll(pageRequest).stream()
@@ -103,7 +105,7 @@ public class UserService {
     @Transactional
     public UserUpdateResponseDto updateUserRole(String username, UserUpdateRoleRequestDto request) {
         User user = userRepository.findById(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         // TODO : 수정필요
         //user.setRole(User.RoleType.valueOf(request.getRole().toUpperCase()));
 

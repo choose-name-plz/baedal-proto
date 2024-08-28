@@ -1,12 +1,12 @@
 package com.nameplz.baedal.domain.user.domain;
 
 import com.nameplz.baedal.domain.model.BaseEntity;
+import com.nameplz.baedal.domain.user.dto.request.UserUpdateRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter
-@ToString
 @Table(name = "p_user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
@@ -42,20 +42,16 @@ public class User extends BaseEntity {
         return user;
     }
 
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
+    public void update(UserUpdateRequestDto request) {
+        this.nickname = request.nickname();
+        this.email = request.email();
+        // 비밀번호는 이미 인코딩된 상태로 받아서 처리
+        this.password = request.password(); // 비밀번호는 인코딩된 상태로 설정
+        this.isPublic = request.isPublic();
     }
 
-    public void updateEmail(String email) {
-        this.email = email;
-    }
-
-    public void updateEncodedPassword(String encodedPassword) {
+    // 비밀번호 업데이트 메서드
+    public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
     }
-
-    public void updateIsPublic(boolean isPublic) {
-        this.isPublic = isPublic;
-    }
-
 }
