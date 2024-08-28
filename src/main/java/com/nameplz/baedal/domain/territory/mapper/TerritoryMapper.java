@@ -11,6 +11,7 @@ import org.mapstruct.Mapper;
 public interface TerritoryMapper {
 
     // Territory목록을 ResponseDto로 매핑
-    List<TerritoryResponseDto> territoryToResponseDto(List<Territory> territoryList);
+    List<TerritoryResponseDto> listTerritoryToResponseDto(List<Territory> territoryList);
 
+    TerritoryResponseDto categoryToResponseDto(Territory territory);
 }

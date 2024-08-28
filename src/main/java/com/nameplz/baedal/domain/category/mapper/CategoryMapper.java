@@ -11,6 +11,8 @@ import org.mapstruct.Mapper;
 public interface CategoryMapper {
 
     // Category목록을 ResponseDto에 맞게 수정
-    List<CategoryResponseDto> categoryToResponseDto(List<Category> category);
+    List<CategoryResponseDto> listCategoryToResponseDto(List<Category> category);
+
+    CategoryResponseDto categoryToResponseDto(Category category);
 
 }

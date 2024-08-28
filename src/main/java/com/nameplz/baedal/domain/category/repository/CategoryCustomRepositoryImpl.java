@@ -7,15 +7,13 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
+@Slf4j
 @RequiredArgsConstructor
 public class CategoryCustomRepositoryImpl implements CategoryCustomRepository {
-
-    private final Logger log = LoggerFactory.getLogger(getClass());
-
+    
     private final JPAQueryFactory query;
 
     @Override
@@ -25,10 +23,17 @@ public class CategoryCustomRepositoryImpl implements CategoryCustomRepository {
         if (StringUtils.hasText(categoryName)) {
             builder.and(category.name.eq(categoryName));
         }
-        
+
+        // 삭제 정보는 조회하지 않는다.
+        checkNotDelete(builder);
+
         return query.select(category)
             .from(category)
             .where(builder)
             .fetch();
+    }
+
+    private void checkNotDelete(BooleanBuilder builder) {
+        builder.and(category.deletedAt.isNull());
     }
 }
