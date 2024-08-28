@@ -66,7 +66,6 @@ public class ProductService {
         //TODO: Store에서 User가 같은지 확인한다.
 
         List<Product> productList = new ArrayList<>();
-
         for (ProductCreateRequestDto requestDto : productDtoList) {
             if (!requestDto.storeId().equals(storeId)) {
                 log.error("잘못된 Store의 상품이 입력되었습니다. 원래 상품 : {}  잘못입력 상품 : {}", storeId,
@@ -77,9 +76,8 @@ public class ProductService {
                 requestDto.price(), requestDto.image(), store));
         }
 
-        productRepository.saveAll(productList);
-
-        return productList.stream()
+        List<Product> products = productRepository.saveAll(productList);
+        return products.stream()
             .map(product -> new ProductIdResponseDto(product.getId().toString())).toList();
     }
 
