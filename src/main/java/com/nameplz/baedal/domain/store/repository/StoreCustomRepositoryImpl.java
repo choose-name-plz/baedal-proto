@@ -1,5 +1,6 @@
 package com.nameplz.baedal.domain.store.repository;
 
+import static com.nameplz.baedal.domain.store.domain.QProduct.product;
 import static com.nameplz.baedal.domain.store.domain.QStore.store;
 
 import com.nameplz.baedal.domain.category.domain.QCategory;
@@ -26,7 +27,7 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
     @Override
     public List<Store> findStoreList(String title, UUID categoryId, StoreStatus status,
         Pageable pageable) {
-        
+
         BooleanBuilder builder = new BooleanBuilder();
         checkNotDelete(builder);
 
@@ -60,24 +61,25 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
      * 가게의 정렬 기준 확인 현재는 createdAt, updatedAt만 지원한다.
      */
     private OrderSpecifier<?> storeSort(Pageable pageable) {
+        // 만약 정렬조건이 없으면 기본값 정렬 진행
         if (pageable.getSort().isEmpty()) {
             return new OrderSpecifier<>(Order.DESC, store.createdAt);
-        } else {
-            for (Sort.Order order : pageable.getSort()) {
-                Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+        }
 
-                switch (order.getProperty()) {
-                    case "updatedAt":
-                        return new OrderSpecifier<>(direction, store.updatedAt);
-                    case "createdAt":
+        for (Sort.Order order : pageable.getSort()) {
+            Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
 
-                    default:
-                        return new OrderSpecifier<>(direction, store.createdAt);
-                }
+            switch (order.getProperty()) {
+                case "updatedAt":
+                    return new OrderSpecifier<>(direction, store.updatedAt);
+                case "createdAt":
+
+                default:
+                    return new OrderSpecifier<>(direction, store.createdAt);
             }
         }
-        // 도달 안할 것으로  확인
-        return null;
+        // 도달 안할 것으로 확인 되지만 에러 발생 처리
+        return new OrderSpecifier<>(Order.DESC, product.createdAt);
     }
 
     private void checkNotDelete(BooleanBuilder builder) {

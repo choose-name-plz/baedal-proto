@@ -46,7 +46,7 @@ public class ProductController {
         Product 생성
      */
     @PostMapping
-    public CommonResponse<String> createProduct(
+    public CommonResponse<ProductIdResponseDto> createProduct(
         @RequestBody ProductCreateRequestDto requestDto
     ) {
         //TODO: Owner만 접근 하도록 권한관리
@@ -54,7 +54,7 @@ public class ProductController {
         String productId = productService.createProduct(username, requestDto.name(),
             requestDto.description(),
             requestDto.price(), requestDto.image(), requestDto.storeId());
-        return CommonResponse.success(productId);
+        return CommonResponse.success(new ProductIdResponseDto(productId));
     }
 
     /*

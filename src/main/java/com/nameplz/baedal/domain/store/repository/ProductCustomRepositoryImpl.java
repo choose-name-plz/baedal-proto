@@ -48,23 +48,25 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
      * 상품의 정렬 기준 확인 현재는 createdAt, updatedAt만 지원한다.
      */
     private OrderSpecifier<?> productSort(Pageable pageable) {
+        // 만약 정렬조건이 없으면 기본값 정렬 진행
         if (pageable.getSort().isEmpty()) {
             return new OrderSpecifier<>(Order.DESC, product.createdAt);
-        } else {
-            for (Sort.Order order : pageable.getSort()) {
-                Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+        }
 
-                switch (order.getProperty()) {
-                    case "updatedAt":
-                        return new OrderSpecifier<>(direction, product.updatedAt);
-                    case "createdAt":
-                    default:
-                        return new OrderSpecifier<>(direction, product.createdAt);
-                }
+        for (Sort.Order order : pageable.getSort()) {
+            Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+
+            switch (order.getProperty()) {
+                case "updatedAt":
+                    return new OrderSpecifier<>(direction, product.updatedAt);
+                case "createdAt":
+                default:
+                    return new OrderSpecifier<>(direction, product.createdAt);
+
             }
         }
-        // 도달 안할 것으로  확인
-        return null;
+        // 도달 안할 것으로 확인 되지만 에러 발생 처리
+        return new OrderSpecifier<>(Order.DESC, product.createdAt);
     }
 
     private void checkNotDelete(BooleanBuilder builder) {

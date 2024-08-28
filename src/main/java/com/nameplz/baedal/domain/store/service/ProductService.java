@@ -13,10 +13,8 @@ import com.nameplz.baedal.global.common.response.ResultCase;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,8 +80,7 @@ public class ProductService {
         productRepository.saveAll(productList);
 
         return productList.stream()
-            .map(product -> new ProductIdResponseDto(product.getId().toString()))
-            .collect(Collectors.toList());
+            .map(product -> new ProductIdResponseDto(product.getId().toString())).toList();
     }
 
     /**
@@ -155,19 +152,11 @@ public class ProductService {
      * Product 목록 조회
      */
     public List<ProductResponseDto> findProductList(Pageable pageable) {
-
-        Page<Product> productList = productRepository.findAll(pageable);
-
-        List<ProductResponseDto> list = new ArrayList<>();
-
-        for (Product product : productList) {
-            list.add(
-                new ProductResponseDto(product.getStore().getId().toString(), product.getName(),
-                    product.getDescription(), product.getImage(), product.isPublic(),
-                    product.getPrice(), product.getCreatedAt()));
-        }
-
-        return list;
+        return productRepository.findAll(pageable).stream()
+            .map(product -> new ProductResponseDto(product.getStore().getId().toString(),
+                product.getName(),
+                product.getDescription(), product.getImage(), product.isPublic(),
+                product.getPrice(), product.getCreatedAt())).toList();
     }
 
     /**
@@ -176,22 +165,19 @@ public class ProductService {
     public List<ProductResponseDto> findProductListByStore(UUID storeId, boolean hideNotPublic,
         Pageable pageable) {
 
-        Store store = storeRepository.findById(storeId)
+        // store가 존재하는 지 확인
+        storeRepository.findById(storeId)
             .orElseThrow(() -> new GlobalException(
                 ResultCase.NOT_FOUND));
 
         List<Product> productList = productRepository.findProductListByStoreId(
             storeId, hideNotPublic, pageable);
 
-        List<ProductResponseDto> list = new ArrayList<>();
-
-        for (Product product : productList) {
-            list.add(
-                new ProductResponseDto(product.getStore().getId().toString(), product.getName(),
-                    product.getDescription(), product.getImage(), product.isPublic(),
-                    product.getPrice(), product.getCreatedAt()));
-        }
-        return list;
+        return productList.stream().map(
+            product -> new ProductResponseDto(product.getStore().getId().toString(),
+                product.getName(),
+                product.getDescription(), product.getImage(), product.isPublic(),
+                product.getPrice(), product.getCreatedAt())).toList();
     }
 
 }
