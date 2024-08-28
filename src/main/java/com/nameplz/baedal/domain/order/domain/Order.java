@@ -3,6 +3,7 @@ package com.nameplz.baedal.domain.order.domain;
 import com.nameplz.baedal.domain.model.Address;
 import com.nameplz.baedal.domain.model.BaseEntity;
 import com.nameplz.baedal.domain.model.Money;
+import com.nameplz.baedal.domain.payment.domain.Payment;
 import com.nameplz.baedal.domain.store.domain.Store;
 import com.nameplz.baedal.domain.user.domain.User;
 import com.nameplz.baedal.global.common.exception.GlobalException;
@@ -58,6 +59,10 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderLine> orderLines = new ArrayList<>();
 
+    @OneToOne
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
     public static Order create(OrderStatus orderStatus, OrderType orderType, String comment, Address address, User user, Store store) {
 
         Order order = new Order();
@@ -110,5 +115,12 @@ public class Order extends BaseEntity {
 
     private boolean isOrderCancelable() {
         return LocalDateTime.now().isBefore(this.createdAt.plusMinutes(ORDER_CANCELABLE_MINUTES));
+    }
+
+    /**
+     * 결제 완료
+     */
+    public void completePayment(Payment payment) {
+        this.payment = payment;
     }
 }
