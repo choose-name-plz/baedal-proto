@@ -36,16 +36,16 @@ public class Payment extends BaseEntity {
     private PaymentStatus status;
 
     /**
-     * 외부에서 결제 성공 시 Payment 객체를 생성
+     * 외부 결제 모듈의 결과를 저장
      */
-    public static Payment create(Money amount, String paymentKey, PaymentMethod method) {
+    public static Payment create(Money amount, String paymentKey, PaymentMethod method, PaymentStatus status) {
 
         Payment payment = new Payment();
 
         payment.amount = amount;
         payment.paymentKey = paymentKey;
         payment.method = method;
-        payment.status = PaymentStatus.PAYMENT_SUCCESS;
+        payment.status = status;
 
         return payment;
     }
