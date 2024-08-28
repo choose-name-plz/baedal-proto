@@ -1,5 +1,9 @@
 package com.nameplz.baedal.domain.territory.dto.request;
 
-public record TerritoryUpdateRequestDto(String territoryName) {
+import jakarta.validation.constraints.NotBlank;
+
+public record TerritoryUpdateRequestDto(
+    @NotBlank
+    String name) {
 
 }

@@ -11,6 +11,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,7 @@ public class CategoryController {
      */
     @PostMapping
     public ResponseEntity<CommonResponse<CategoryIdResponseDto>> addCategory(
-        @RequestBody CategoryAddRequestDto requestBody) {
+        @RequestBody @Validated CategoryAddRequestDto requestBody) {
         //TODO: 마스터만 호출할 수 있도록 추가
         String categoryId = categoryService.addCategory(requestBody.name());
         return new ResponseEntity<>(
@@ -57,12 +58,12 @@ public class CategoryController {
     @PutMapping("/{id}")
     public CommonResponse<CategoryResponseDto> updateCategory(
         @PathVariable("id") UUID categoryId,
-        @RequestBody CategoryUpdateRequestDto requestBody
+        @RequestBody @Validated CategoryUpdateRequestDto requestBody
     ) {
 
         //TODO: 마스터만 호출할 수 있도록 추가
         CategoryResponseDto categoryResponseDto = categoryService.updateCategory(categoryId,
-            requestBody.categoryName());
+            requestBody.name());
 
         return CommonResponse.success(categoryResponseDto);
     }

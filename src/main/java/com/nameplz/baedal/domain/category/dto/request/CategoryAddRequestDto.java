@@ -1,5 +1,10 @@
 package com.nameplz.baedal.domain.category.dto.request;
 
-public record CategoryAddRequestDto(String name) {
+import jakarta.validation.constraints.NotBlank;
+
+public record CategoryAddRequestDto(
+    @NotBlank
+    String name
+) {
 
 }

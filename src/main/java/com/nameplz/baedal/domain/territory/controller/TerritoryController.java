@@ -11,6 +11,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,7 @@ public class TerritoryController {
      */
     @PostMapping
     public ResponseEntity<CommonResponse<TerritoryIdResponseDto>> addCategory(
-        @RequestBody TerritoryAddRequestDto requestBody) {
+        @RequestBody @Validated TerritoryAddRequestDto requestBody) {
         //TODO: 마스터만 호출할 수 있도록 추가
         String territoryId = territoryService.addTerritory(requestBody.name());
         return new ResponseEntity<>(
@@ -58,12 +59,12 @@ public class TerritoryController {
     @PutMapping("/{id}")
     public CommonResponse<TerritoryResponseDto> updateTerritory(
         @PathVariable("id") UUID territoryId,
-        @RequestBody TerritoryUpdateRequestDto requestDto
+        @RequestBody @Validated TerritoryUpdateRequestDto requestDto
     ) {
 
         //TODO: 마스터만 호출할 수 있도록 추가
         TerritoryResponseDto territoryResponseDto = territoryService.updateTerritory(
-            territoryId, requestDto.territoryName());
+            territoryId, requestDto.name());
 
         return CommonResponse.success(territoryResponseDto);
     }
