@@ -4,7 +4,6 @@ import com.nameplz.baedal.domain.model.Money;
 import com.nameplz.baedal.domain.order.domain.Order;
 import com.nameplz.baedal.domain.order.domain.OrderLine;
 import com.nameplz.baedal.domain.order.domain.OrderStatus;
-import com.nameplz.baedal.domain.order.domain.OrderType;
 import com.nameplz.baedal.domain.order.dto.request.CreateOrderRequestDto;
 import com.nameplz.baedal.domain.order.dto.request.UpdateOrderStatusRequestDto;
 import com.nameplz.baedal.domain.order.dto.response.OrderResponseDto;
@@ -82,11 +81,9 @@ public class OrderService {
 
     private Order createOrderEntity(CreateOrderRequestDto requestDto, User user, Store store) {
 
-        OrderType orderType = OrderType.findByName(requestDto.orderType());
-
         return Order.create(
                 OrderStatus.PAYMENT_WAITING,
-                orderType,
+                requestDto.orderType(),
                 requestDto.comment(),
                 requestDto.address(),
                 user,
@@ -111,10 +108,8 @@ public class OrderService {
     @Transactional
     public void updateOrderStatus(UUID orderId, UpdateOrderStatusRequestDto request) {
 
-        OrderStatus orderStatus = OrderStatus.findByName(request.orderStatus());
-
         Order order = findOrder(orderId);
-        order.updateOrderStatus(orderStatus);
+        order.updateOrderStatus(request.orderStatus());
     }
 
     /**
