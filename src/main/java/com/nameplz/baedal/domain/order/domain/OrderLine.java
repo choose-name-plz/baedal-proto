@@ -46,4 +46,8 @@ public class OrderLine extends BaseEntity {
 
         return orderProduct;
     }
+
+    public Money getTotalPrice() {
+        return amount.multiply(quantity);
+    }
 }

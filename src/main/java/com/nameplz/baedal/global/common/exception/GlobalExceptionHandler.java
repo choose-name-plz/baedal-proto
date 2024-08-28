@@ -5,6 +5,8 @@ import com.nameplz.baedal.global.common.response.EmptyResponseDto;
 import com.nameplz.baedal.global.common.response.ResultCase;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -14,6 +16,7 @@ import java.util.List;
 /**
  * 전역 예외 처리 핸들러
  */
+@Slf4j
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
@@ -29,6 +32,16 @@ public class GlobalExceptionHandler {
         response.setStatus(e.getResultCase().getHttpStatus().value()); // HttpStatus 설정
 
         return CommonResponse.error(e.getResultCase()); // 공통 응답 양식 반환
+    }
+
+    /**
+     * RequestBody 입력 파라미터가 없거나 형식이 맞지 않을 때 발생하는 오류에 대한 핸들러
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public CommonResponse<EmptyResponseDto> handleGlobalException(HttpMessageNotReadableException e) {
+        response.setStatus(ResultCase.INVALID_INPUT.getHttpStatus().value()); // HttpStatus 설정
+
+        return CommonResponse.error(ResultCase.INVALID_INPUT); // 공통 응답 양식 반환
     }
 
     /**
