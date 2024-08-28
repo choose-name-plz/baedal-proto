@@ -79,6 +79,6 @@ public class PaymentService {
 
     private Payment findPayment(UUID paymentId) {
         return paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new GlobalException(ResultCase.PAYMENT_NOT_FUND));
+                .orElseThrow(() -> new GlobalException(ResultCase.PAYMENT_NOT_FOUND));
     }
 }

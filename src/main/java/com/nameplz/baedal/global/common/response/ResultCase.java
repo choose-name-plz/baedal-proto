@@ -44,7 +44,7 @@ public enum ResultCase {
     /* 결제 4000번대 */
 
     // 결제 정보를 찾을 수 없음 404
-    PAYMENT_NOT_FUND(HttpStatus.NOT_FOUND, 4000, "결제 정보를 찾을 수 없습니다.");
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, 4000, "결제 정보를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus; // 응답 상태 코드
     private final Integer code; // 응답 코드. 도메인에 따라 1000번대로 나뉨
