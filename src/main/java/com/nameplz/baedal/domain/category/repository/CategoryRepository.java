@@ -9,4 +9,6 @@ public interface CategoryRepository extends JpaRepository<Category, UUID>,
     CategoryCustomRepository {
 
     Optional<Category> findByName(String name);
+
+    Optional<Category> findByIdAndDeletedAtIsNull(UUID categoryId);
 }

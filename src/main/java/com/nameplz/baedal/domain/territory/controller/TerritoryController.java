@@ -9,8 +9,6 @@ import com.nameplz.baedal.global.common.response.CommonResponse;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,13 +31,11 @@ public class TerritoryController {
      * territory 생성
      */
     @PostMapping
-    public ResponseEntity<CommonResponse<TerritoryIdResponseDto>> addCategory(
+    public CommonResponse<TerritoryIdResponseDto> addCategory(
         @RequestBody @Validated TerritoryAddRequestDto requestBody) {
         //TODO: 마스터만 호출할 수 있도록 추가
         String territoryId = territoryService.addTerritory(requestBody.name());
-        return new ResponseEntity<>(
-            CommonResponse.success(new TerritoryIdResponseDto(territoryId)),
-            HttpStatus.CREATED);
+        return CommonResponse.success(new TerritoryIdResponseDto(territoryId));
     }
 
     /**

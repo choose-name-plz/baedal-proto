@@ -48,7 +48,15 @@ public enum ResultCase {
 
     /* 리뷰 5000번대 */
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, 5000, "리뷰를 찾을 수 없습니다."),
-    ;
+
+    /* 가게 및 상품 5000 번대*/
+    STORE_NOT_FOUND(HttpStatus.NOT_FOUND, 5000, "가게 정보를 찾을 수 없습니다."),
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, 5001, "상품 정보를 찾을 수 없습니다."),
+
+    /* 카테고리 및 지역 6000 번대*/
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 6000, "카테고리 정보를 찾을 수 없습니다."),
+    TERRITORY_NOT_FOUND(HttpStatus.NOT_FOUND, 6001, "지역 정보를 찾을 수 없습니다.");
+
 
     private final HttpStatus httpStatus; // 응답 상태 코드
     private final Integer code; // 응답 코드. 도메인에 따라 1000번대로 나뉨

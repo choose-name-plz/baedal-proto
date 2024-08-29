@@ -10,4 +10,5 @@ public interface TerritoryRepository extends JpaRepository<Territory, UUID>,
 
     Optional<Territory> findByName(String name);
 
+    Optional<Territory> findByIdAndDeletedAtIsNull(UUID territoryId);
 }

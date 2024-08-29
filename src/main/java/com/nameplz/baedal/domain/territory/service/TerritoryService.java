@@ -65,8 +65,8 @@ public class TerritoryService {
     }
 
     private Territory findTerritoryById(UUID territoryId) {
-        return territoryRepository.findById(territoryId)
-            .orElseThrow(() -> new GlobalException(ResultCase.NOT_FOUND));
+        return territoryRepository.findByIdAndDeletedAtIsNull(territoryId)
+            .orElseThrow(() -> new GlobalException(ResultCase.TERRITORY_NOT_FOUND));
     }
 
 }

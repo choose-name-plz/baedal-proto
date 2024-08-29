@@ -170,15 +170,15 @@ public class ProductService {
      * Id 별로 있는지 확인 후 불러오는 함수 모음
      */
     private Store findStoreById(UUID storeId) {
-        return storeRepository.findById(storeId)
+        return storeRepository.findByIdAndDeletedAtIsNull(storeId)
             .orElseThrow(() -> new GlobalException(
-                ResultCase.INVALID_INPUT));
+                ResultCase.STORE_NOT_FOUND));
     }
 
     private Product findProductByIdAndCheck(UUID productId) {
-        return productRepository.findById(productId)
+        return productRepository.findByIdAndDeletedAtIsNull(productId)
             .orElseThrow(() -> new GlobalException(
-                ResultCase.INVALID_INPUT));
+                ResultCase.PRODUCT_NOT_FOUND));
     }
 
 }
