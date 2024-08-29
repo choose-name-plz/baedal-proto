@@ -1,0 +1,12 @@
+GET http://localhost:8080/reviews/orders/f0c55630-eabb-41d0-8545-7b843071288f
+
+###
+
+POST http://localhost:8080/reviews/orders/f0c55630-eabb-41d0-8545-7b843071288f
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "content": "Great service!",
+  "isReported": false
+}
