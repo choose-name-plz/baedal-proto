@@ -1,11 +1,8 @@
 package com.nameplz.baedal.domain.user.domain;
 
-import com.nameplz.baedal.global.common.exception.GlobalException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
 
-import java.util.Arrays;
 
 @RequiredArgsConstructor
 @Getter
@@ -19,6 +16,7 @@ public enum UserRole {
 
     // Secured 처리시 하드코딩을 줄이기 위한 클래스
     public static class Authority {
+
         public static final String CUSTOMER = "ROLE_CUSTOMER";
         public static final String OWNER = "ROLE_OWNER";
         public static final String MASTER = "ROLE_MASTER";
