@@ -69,7 +69,7 @@ public class CategoryService {
     // 카테고리 Id 찾는 함수
     private Category findCategoryById(UUID categoryId) {
         return categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new GlobalException(ResultCase.NOT_FOUND));
+            .orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
     }
 
 }

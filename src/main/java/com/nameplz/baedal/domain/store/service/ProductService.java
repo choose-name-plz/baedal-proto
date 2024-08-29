@@ -25,9 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProductService {
 
+    //repository
     private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
-
+    //mapper
     private final ProductMapper productMapper;
 
     /**
@@ -35,18 +36,14 @@ public class ProductService {
      */
     @Transactional
     public String createProduct(String username,
-        String name, String description, Integer price, String image, String storeId) {
+        String name, String description, Integer price, String image, UUID storeId) {
 
-        Store store = storeRepository.findById(UUID.fromString(storeId))
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
+        Store store = findStoreById(storeId);
 
         //TODO: Store에서 User가 같은지 확인한다.
 
         Product product = Product.createProduct(name, description, price, image, store);
-
         productRepository.save(product);
-
         return product.getId().toString();
     }
 
@@ -57,15 +54,15 @@ public class ProductService {
     public List<ProductIdResponseDto> createProductBatch(
         String username,
         List<ProductCreateRequestDto> productDtoList,
-        String storeId) {
+        UUID storeId) {
 
-        Store store = storeRepository.findById(UUID.fromString(storeId))
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
+        Store store = findStoreById(storeId);
 
         //TODO: Store에서 User가 같은지 확인한다.
 
         List<Product> productList = new ArrayList<>();
+
+        // 입력한 Product의 StoreId가 적합한지 확인 후 Product 객체 생성
         for (ProductCreateRequestDto requestDto : productDtoList) {
             if (!requestDto.storeId().equals(storeId)) {
                 log.error("잘못된 Store의 상품이 입력되었습니다. 원래 상품 : {}  잘못입력 상품 : {}", storeId,
@@ -93,9 +90,7 @@ public class ProductService {
         String image,
         boolean isPublic
     ) {
-        Product product = productRepository.findById(productId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
+        Product product = findProductByIdAndCheck(productId);
 
         //TODO: Store에서 User가 같은지 확인한다.
 
@@ -110,22 +105,17 @@ public class ProductService {
      */
     @Transactional
     public ProductResponseDto updateProductStatus(UUID productId, boolean isPublic) {
-        Product product = productRepository.findById(productId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
+        Product product = findProductByIdAndCheck(productId);
 
         //TODO: Store에서 User가 같은지 확인한다.
 
         product.updateProductPublic(isPublic);
-
         return productMapper.productToDto(product);
     }
 
     @Transactional
-    public String deleteProduct(String productId, String username) {
-        Product product = productRepository.findById(UUID.fromString(productId))
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
+    public String deleteProduct(UUID productId, String username) {
+        Product product = findProductByIdAndCheck(productId);
 
         //TODO: Store에서 User가 같은지 확인한다.
 
@@ -139,10 +129,7 @@ public class ProductService {
      */
     public ProductResponseDto findProductById(UUID productId) {
 
-        Product product = productRepository.findById(productId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
-
+        Product product = findProductByIdAndCheck(productId);
         return productMapper.productToDto(product);
     }
 
@@ -151,7 +138,9 @@ public class ProductService {
      */
     public List<ProductResponseDto> findProductList(Pageable pageable) {
         return productRepository.findAll(pageable).stream()
-            .map(product -> new ProductResponseDto(product.getStore().getId().toString(),
+            .map(product -> new ProductResponseDto(product.getId().toString()
+                ,
+                product.getStore().getId().toString(),
                 product.getName(),
                 product.getDescription(), product.getImage(), product.isPublic(),
                 product.getPrice(), product.getCreatedAt())).toList();
@@ -164,18 +153,32 @@ public class ProductService {
         Pageable pageable) {
 
         // store가 존재하는 지 확인
-        storeRepository.findById(storeId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
+        findStoreById(storeId);
 
         List<Product> productList = productRepository.findProductListByStoreId(
             storeId, hideNotPublic, pageable);
 
         return productList.stream().map(
-            product -> new ProductResponseDto(product.getStore().getId().toString(),
+            product -> new ProductResponseDto(product.getId().toString(),
+                product.getStore().getId().toString(),
                 product.getName(),
                 product.getDescription(), product.getImage(), product.isPublic(),
                 product.getPrice(), product.getCreatedAt())).toList();
+    }
+
+    /**
+     * Id 별로 있는지 확인 후 불러오는 함수 모음
+     */
+    private Store findStoreById(UUID storeId) {
+        return storeRepository.findById(storeId)
+            .orElseThrow(() -> new GlobalException(
+                ResultCase.INVALID_INPUT));
+    }
+
+    private Product findProductByIdAndCheck(UUID productId) {
+        return productRepository.findById(productId)
+            .orElseThrow(() -> new GlobalException(
+                ResultCase.INVALID_INPUT));
     }
 
 }
