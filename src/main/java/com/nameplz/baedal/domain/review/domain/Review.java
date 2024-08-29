@@ -23,7 +23,8 @@ public class Review extends BaseEntity {
     private String content;
 
     @Column(name = "rating")
-    private Integer rating;
+    @Embedded
+    private Rating rating;
 
     @Column(name = "is_reported")
     private boolean isReported;
