@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,7 +48,7 @@ public class ProductController {
      */
     @PostMapping
     public CommonResponse<ProductIdResponseDto> createProduct(
-        @RequestBody ProductCreateRequestDto requestDto
+        @RequestBody @Validated ProductCreateRequestDto requestDto
     ) {
         //TODO: Owner만 접근 하도록 권한관리
         String username = "iron";
@@ -63,7 +64,7 @@ public class ProductController {
      */
     @PostMapping("/batch")
     public CommonResponse<ProductIdListResponseDto> createProductList(
-        @RequestBody ProductListCreateRequestDto requestDto
+        @RequestBody @Validated ProductListCreateRequestDto requestDto
     ) {
         //TODO: Owner만 접근 하도록 권한관리
         String username = "iron";
@@ -107,7 +108,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public CommonResponse<ProductResponseDto> updateProduct(
         @PathVariable("id") UUID productId,
-        @RequestBody ProductUpdateRequestDto requestDto
+        @RequestBody @Validated ProductUpdateRequestDto requestDto
     ) {
         //TODO: Owner만 접근 하도록 권한관리
         String username = "iron";
@@ -126,7 +127,7 @@ public class ProductController {
     @PatchMapping("/{id}/status")
     public CommonResponse<ProductResponseDto> updateProductStatus(
         @PathVariable("id") UUID productId,
-        @RequestBody ProductUpdateStatusRequestDto requestDto
+        @RequestBody @Validated ProductUpdateStatusRequestDto requestDto
     ) {
 
         //TODO: Owner만 접근 하도록 권한관리
@@ -142,13 +143,13 @@ public class ProductController {
      */
     @DeleteMapping("/{id}")
     public CommonResponse<ProductIdResponseDto> deleteProduct(
-        @PathVariable("id") String id
+        @PathVariable("id") UUID productId
     ) {
         //TODO: 유저에 맞게 변경
         String user = "username";
-        String productId = productService.deleteProduct(id, user);
+        String deletedProduct = productService.deleteProduct(productId, user);
 
-        return CommonResponse.success(new ProductIdResponseDto(productId));
+        return CommonResponse.success(new ProductIdResponseDto(deletedProduct));
     }
 
     // 예외 처리

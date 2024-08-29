@@ -29,7 +29,7 @@ public class StoreService {
 
     // repository
     private final StoreRepository storeRepository;
-    // private final UserRepository userRepository;
+    //    private final UserRepository userRepository;
     private final TerritoryRepository territoryRepository;
     private final CategoryRepository categoryRepository;
 
@@ -43,21 +43,12 @@ public class StoreService {
     public String createStore(String title, String description, String image, UUID territoryId,
         UUID categoryId, String username) {
 
-        // User user = userRepository.findById(username)
-        //     .orElseThrow(() -> new GlobalException(ResultCase.NOT_FOUND));
+        User user = findUserByIdAndCheck(username);
+        Territory territory = findTerritoryByIdAndCheck(territoryId);
+        Category category = findCategoryByIdAndCheck(categoryId);
 
-        Territory territory = territoryRepository.findById(territoryId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
-
-        Category category = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
-
-        Store store = Store.createStore(title, description, image, null, territory, category);
-
+        Store store = Store.createStore(title, description, image, user, territory, category);
         storeRepository.save(store);
-
         return store.getId().toString();
     }
 
@@ -69,22 +60,13 @@ public class StoreService {
         UUID categoryId,
         String title, String description, String image, StoreStatus status) {
 
-        Territory territory = territoryRepository.findById(territoryId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
-
-        Category category = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
-
-        Store store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
+        Territory territory = findTerritoryByIdAndCheck(territoryId);
+        Category category = findCategoryByIdAndCheck(categoryId);
+        Store store = findStoreByIdAndCheck(storeId);
 
         // TODO: 관리자거나 user하고 store 주인하고 같은지 확인
 
         store.updateStore(title, description, image, status, territory, category);
-
         return storeMapper.storeToDto(store, store.getCategory().getName());
     }
 
@@ -94,9 +76,7 @@ public class StoreService {
      */
     @Transactional
     public StoreResponseDto updateStoreStatus(String username, UUID storeId, StoreStatus status) {
-        Store store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
+        Store store = findStoreByIdAndCheck(storeId);
 
         // TODO: 관리자거나 user하고 store 주인하고 같은지 확인
 
@@ -110,12 +90,8 @@ public class StoreService {
      */
     @Transactional
     public StoreResponseDto updateStoreCategory(String username, UUID storeId, UUID categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
-        Store store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
+        Category category = findCategoryByIdAndCheck(categoryId);
+        Store store = findStoreByIdAndCheck(storeId);
 
         // TODO: 관리자거나 user하고 store 주인하고 같은지 확인
         store.updateStoreCategory(category);
@@ -128,13 +104,8 @@ public class StoreService {
      */
     @Transactional
     public StoreResponseDto updateStoreTerritory(String username, UUID storeId, UUID territoryId) {
-        Territory territory = territoryRepository.findById(territoryId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
-
-        Store store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
+        Territory territory = findTerritoryByIdAndCheck(territoryId);
+        Store store = findStoreByIdAndCheck(storeId);
 
         // TODO: 관리자거나 user하고 store 주인하고 같은지 확인
         store.updateStoreTerritory(territory);
@@ -148,9 +119,7 @@ public class StoreService {
      */
     @Transactional
     public String deleteStore(String username, UUID storeId) {
-        Store store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
+        Store store = findStoreByIdAndCheck(storeId);
 
         // TODO: user하고 store 주인하고 같은지 확인
         store.deleteEntity(username);
@@ -161,9 +130,7 @@ public class StoreService {
      * Store 단일 검색
      */
     public StoreResponseDto findStoreById(UUID storeId) {
-        Store store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new GlobalException(
-                ResultCase.NOT_FOUND));
+        Store store = findStoreByIdAndCheck(storeId);
 
         return storeMapper.storeToDto(store, store.getCategory().getName());
     }
@@ -176,9 +143,7 @@ public class StoreService {
 
         // 잘못된 카테고리 입력 여부 확인
         if (categoryId != null) {
-            categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new GlobalException(
-                    ResultCase.NOT_FOUND));
+            findCategoryByIdAndCheck(categoryId);
         }
 
         List<Store> storeList = storeRepository.findStoreList(title, categoryId, status, pageable);
@@ -192,6 +157,33 @@ public class StoreService {
         }
 
         return output;
+    }
+
+    /**
+     * Id 별로 있는지 확인 후 불러오는 함수 모음
+     */
+    private User findUserByIdAndCheck(String username) {
+        //TODO 추후 합병
+        return null;
+//        return userRepository.findById(username)
+//            .orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
+    }
+
+    private Store findStoreByIdAndCheck(UUID storeId) {
+        return storeRepository.findById(storeId)
+            .orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
+    }
+
+    private Territory findTerritoryByIdAndCheck(UUID territoryId) {
+        return territoryRepository.findById(territoryId)
+            .orElseThrow(() -> new GlobalException(
+                ResultCase.INVALID_INPUT));
+    }
+
+    private Category findCategoryByIdAndCheck(UUID categoryId) {
+        return categoryRepository.findById(categoryId)
+            .orElseThrow(() -> new GlobalException(
+                ResultCase.INVALID_INPUT));
     }
 
 

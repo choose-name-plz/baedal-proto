@@ -26,6 +26,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,8 +53,8 @@ public class StoreController {
         Store 생성
      */
     @PostMapping
-    public CommonResponse<String> createStore(
-        @RequestBody StoreCreateRequestDto requestDto) {
+    public CommonResponse<StoreIdResponseDto> createStore(
+        @RequestBody @Validated StoreCreateRequestDto requestDto) {
 
         //TODO: Owner만 접근 하도록 권한관리
         String user = "iron";
@@ -67,7 +68,7 @@ public class StoreController {
             user
         );
 
-        return CommonResponse.success(storeId);
+        return CommonResponse.success(new StoreIdResponseDto(storeId));
     }
 
     /*
@@ -76,7 +77,7 @@ public class StoreController {
     @PutMapping("/{id}")
     public CommonResponse<StoreResponseDto> updateStore(
         @PathVariable("id") UUID storeId,
-        @RequestBody StoreUpdateRequestDto requestDto
+        @RequestBody @Validated StoreUpdateRequestDto requestDto
     ) {
         //TODO: Owner만 접근 하도록 권한관리
         String username = "iron";

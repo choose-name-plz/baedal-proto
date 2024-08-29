@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = SPRING)
 public interface ProductMapper {
 
+    @Mapping(source = "product.id", target = "productId")
     @Mapping(expression = "java(product.getStore().getId().toString())", target = "storeId")
     @Mapping(expression = "java(product.isPublic())", target = "isPublic")
     ProductResponseDto productToDto(Product product);
