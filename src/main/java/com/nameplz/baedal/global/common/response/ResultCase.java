@@ -39,7 +39,12 @@ public enum ResultCase {
     // 존재하지 않는 주문 404
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, 3002, "주문을 찾을 수 없습니다."),
     // 주문 취소 불가 400
-    ORDER_CANCEL_DENIED(HttpStatus.BAD_REQUEST, 3003, "주문을 취소할 수 없습니다.");
+    ORDER_CANCEL_DENIED(HttpStatus.BAD_REQUEST, 3003, "주문을 취소할 수 없습니다."),
+
+    /* 결제 4000번대 */
+
+    // 결제 정보를 찾을 수 없음 404
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, 4000, "결제 정보를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus; // 응답 상태 코드
     private final Integer code; // 응답 코드. 도메인에 따라 1000번대로 나뉨
