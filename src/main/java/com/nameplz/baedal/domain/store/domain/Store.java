@@ -5,14 +5,27 @@ import com.nameplz.baedal.domain.model.BaseEntity;
 import com.nameplz.baedal.domain.review.domain.Review;
 import com.nameplz.baedal.domain.territory.domain.Territory;
 import com.nameplz.baedal.domain.user.domain.User;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
+import org.hibernate.annotations.BatchSize;
 
 @Table(name = "p_store")
 @Getter
@@ -33,8 +46,9 @@ public class Store extends BaseEntity {
     @Column
     private String image;
 
-    @Column(name = "is_opened")
-    private boolean isOpened;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "store_status", nullable = false)
+    private StoreStatus status;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -48,6 +62,7 @@ public class Store extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     private List<Product> productList = new ArrayList<>();
 
@@ -55,7 +70,8 @@ public class Store extends BaseEntity {
     private List<Review> reviewList = new ArrayList<>();
 
     public static Store createStore(
-        String title, String description, String image, User user,  Territory territory, Category category) {
+        String title, String description, String image, User user, Territory territory,
+        Category category) {
         Store store = new Store();
         // 필드 값
         store.title = title;
@@ -67,7 +83,7 @@ public class Store extends BaseEntity {
         store.category = category;
 
         // 기본 값
-        store.isOpened = true;
+        store.status = StoreStatus.CLOSE;
         return store;
     }
 
@@ -78,4 +94,39 @@ public class Store extends BaseEntity {
         this.productList.add(product);
     }
 
+
+    /**
+     * 가게 업데이트
+     */
+    public void updateStore(String title, String description, String image, StoreStatus status,
+        Territory territory,
+        Category category) {
+        this.title = title;
+        this.description = description;
+        this.image = image;
+        this.territory = territory;
+        this.status = status;
+        this.category = category;
+    }
+
+    /**
+     * 가게 상태 변경
+     */
+    public void updateStoreStatus(StoreStatus status) {
+        this.status = status;
+    }
+
+    /**
+     * 가게 카테고리 변경
+     */
+    public void updateStoreCategory(Category category) {
+        this.category = category;
+    }
+
+    /**
+     * 가게 지역 변경
+     */
+    public void updateStoreTerritory(Territory territory) {
+        this.territory = territory;
+    }
 }

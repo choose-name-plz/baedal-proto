@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum OrderType {
-    DELIVERY("배달"),
-    TAKEOUT("포장"),
-    EAT_IN("매장 식사");
+
+    ONLINE("온라인 주문"),
+    OFFLINE("오프라인 주문");
 
     private final String description;
 }
