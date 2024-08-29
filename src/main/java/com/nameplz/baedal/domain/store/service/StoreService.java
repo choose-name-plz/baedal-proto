@@ -170,20 +170,20 @@ public class StoreService {
     }
 
     private Store findStoreByIdAndCheck(UUID storeId) {
-        return storeRepository.findById(storeId)
-            .orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
+        return storeRepository.findByIdAndDeletedAtIsNull(storeId)
+            .orElseThrow(() -> new GlobalException(ResultCase.STORE_NOT_FOUND));
     }
 
     private Territory findTerritoryByIdAndCheck(UUID territoryId) {
-        return territoryRepository.findById(territoryId)
+        return territoryRepository.findByIdAndDeletedAtIsNull(territoryId)
             .orElseThrow(() -> new GlobalException(
-                ResultCase.INVALID_INPUT));
+                ResultCase.TERRITORY_NOT_FOUND));
     }
 
     private Category findCategoryByIdAndCheck(UUID categoryId) {
-        return categoryRepository.findById(categoryId)
+        return categoryRepository.findByIdAndDeletedAtIsNull(categoryId)
             .orElseThrow(() -> new GlobalException(
-                ResultCase.INVALID_INPUT));
+                ResultCase.CATEGORY_NOT_FOUND));
     }
 
 
