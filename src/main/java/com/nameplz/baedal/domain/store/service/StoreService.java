@@ -10,7 +10,6 @@ import com.nameplz.baedal.domain.store.repository.StoreRepository;
 import com.nameplz.baedal.domain.territory.domain.Territory;
 import com.nameplz.baedal.domain.territory.repository.TerritoryRepository;
 import com.nameplz.baedal.domain.user.domain.User;
-import com.nameplz.baedal.domain.user.repository.UserRepository;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class StoreService {
 
     // repository
     private final StoreRepository storeRepository;
-    private final UserRepository userRepository;
+    //    private final UserRepository userRepository;
     private final TerritoryRepository territoryRepository;
     private final CategoryRepository categoryRepository;
 
@@ -164,8 +163,10 @@ public class StoreService {
      * Id 별로 있는지 확인 후 불러오는 함수 모음
      */
     private User findUserByIdAndCheck(String username) {
-        return userRepository.findById(username)
-            .orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
+        //TODO 추후 합병
+        return null;
+//        return userRepository.findById(username)
+//            .orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
     }
 
     private Store findStoreByIdAndCheck(UUID storeId) {
