@@ -53,7 +53,7 @@ public class StoreController {
         Store 생성
      */
     @PostMapping
-    public CommonResponse<String> createStore(
+    public CommonResponse<StoreIdResponseDto> createStore(
         @RequestBody @Validated StoreCreateRequestDto requestDto) {
 
         //TODO: Owner만 접근 하도록 권한관리
@@ -68,7 +68,7 @@ public class StoreController {
             user
         );
 
-        return CommonResponse.success(storeId);
+        return CommonResponse.success(new StoreIdResponseDto(storeId));
     }
 
     /*
