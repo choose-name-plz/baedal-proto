@@ -34,7 +34,7 @@ public class ReviewController {
     @GetMapping("/orders/{orderId}")
     public CommonResponse<ReviewResponseDto> getReview(@PathVariable UUID orderId) {
 
-        ReviewResponseDto response = reviewService.getReviewByOrderId(orderId);
+        ReviewResponseDto response = reviewService.getReviewByOrderIdWithoutDeleted(orderId);
 
         return CommonResponse.success(response);
     }
@@ -48,7 +48,7 @@ public class ReviewController {
             @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable
     ) {
 
-        List<ReviewResponseDto> response = reviewService.getReviewListByUsername(userId, pageable);
+        List<ReviewResponseDto> response = reviewService.getReviewListByUsernameWithoutDeleted(userId, pageable);
 
         return CommonResponse.success(response);
     }
@@ -62,7 +62,7 @@ public class ReviewController {
             @PageableDefault(sort = "createdAt", direction = DESC) Pageable pageable
     ) {
 
-        List<ReviewResponseDto> response = reviewService.getReviewListByStoreId(storeId);
+        List<ReviewResponseDto> response = reviewService.getReviewListByStoreIdWithoutDeleted(storeId, pageable);
 
         return CommonResponse.success(response);
     }
