@@ -28,19 +28,38 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
 
     /**
-     * 주문 아이디로 리뷰 단건 조회
+     * 주문 아이디로 리뷰 단건 조회 - 삭제되지 않은 리뷰만 조회
      */
-    public ReviewResponseDto getReviewByOrderId(UUID orderId) {
-        Review review = reviewRepository.findByOrder_IdAndDeletedAtIsNull(orderId);
+    public ReviewResponseDto getReviewByOrderIdWithoutDeleted(UUID orderId) {
+        Review review = reviewRepository.findByOrderIdWithoutDeleted(orderId);
+        return mapper.toReviewResponseDto(review);
+    }
+
+    /**
+     * 주문 아이디로 리뷰 단건 조회 - 삭제된 리뷰도 조회
+     */
+    public ReviewResponseDto getReviewByOrderIdWithDeleted(UUID orderId) {
+        Review review = reviewRepository.findByOrderId(orderId);
         return mapper.toReviewResponseDto(review);
     }
 
     /**
      * 유저 아이디로 리뷰 리스트 조회
      */
-    public List<ReviewResponseDto> getReviewListByUsername(String username, Pageable pageable) {
+    public List<ReviewResponseDto> getReviewListByUsernameWithoutDeleted(String username, Pageable pageable) {
 
-        return reviewRepository.findAllByUser_UsernameAndDeletedAtIsNull(username, pageable)
+        return reviewRepository.findAllByUsernameWithoutDeleted(username, pageable)
+                .stream()
+                .map(mapper::toReviewResponseDto)
+                .toList();
+    }
+
+    /**
+     * 유저 아이디로 리뷰 리스트 조회
+     */
+    public List<ReviewResponseDto> getReviewListByUsernameWithDeleted(String username, Pageable pageable) {
+
+        return reviewRepository.findAllByUser_Username(username, pageable)
                 .stream()
                 .map(mapper::toReviewResponseDto)
                 .toList();
@@ -49,9 +68,9 @@ public class ReviewService {
     /**
      * 가게 아이디로 리뷰 리스트 조회
      */
-    public List<ReviewResponseDto> getReviewListByStoreId(UUID storeId) {
+    public List<ReviewResponseDto> getReviewListByStoreIdWithoutDeleted(UUID storeId, Pageable pageable) {
 
-        return reviewRepository.findAllReviewsByStoreId(storeId)
+        return reviewRepository.findAllByStoreIdWithoutDeleted(storeId, pageable)
                 .stream()
                 .map(mapper::toReviewResponseDto)
                 .toList();
