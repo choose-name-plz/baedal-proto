@@ -38,7 +38,7 @@ jobs:
       - name: Set YML
         run: |
           mkdir -p src/main/resources
-          echo "${{ env.APPLICATION_SECRET_YML }}" | base64 --decode > src/main/resources/application-prod.yml
+          echo "${{ env.APPLICATION_PROD_YML }}" | base64 --decode > src/main/resources/application-prod.yml
           find src
 
       # 4. Gradle 빌드
