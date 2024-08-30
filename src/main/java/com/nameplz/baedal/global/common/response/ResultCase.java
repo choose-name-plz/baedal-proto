@@ -51,7 +51,9 @@ public enum ResultCase {
 
     /* 가게 및 상품 5000 번대*/
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND, 5000, "가게 정보를 찾을 수 없습니다."),
-    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, 5001, "상품 정보를 찾을 수 없습니다."),
+
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, 5100, "상품 정보를 찾을 수 없습니다."),
+    PRODUCT_NOT_MATCH_STORE_IN_BATCH(HttpStatus.BAD_GATEWAY, 5101, "상품의 가게 정보가 일치하지 않습니다."),
 
     /* 카테고리 및 지역 6000 번대*/
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 6000, "카테고리 정보를 찾을 수 없습니다."),

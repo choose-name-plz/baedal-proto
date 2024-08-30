@@ -2,11 +2,14 @@ package com.nameplz.baedal.domain.web.admin.controller;
 
 import com.nameplz.baedal.domain.category.domain.Category;
 import com.nameplz.baedal.domain.category.repository.CategoryRepository;
+import com.nameplz.baedal.domain.order.domain.Order;
+import com.nameplz.baedal.domain.order.repository.OrderRepository;
 import com.nameplz.baedal.domain.store.domain.Store;
 import com.nameplz.baedal.domain.store.repository.StoreRepository;
 import com.nameplz.baedal.domain.territory.domain.Territory;
 import com.nameplz.baedal.domain.territory.repository.TerritoryRepository;
 import com.nameplz.baedal.domain.web.admin.dto.response.CategoryAdminResponseDto;
+import com.nameplz.baedal.domain.web.admin.dto.response.OrderAdminResponseDto;
 import com.nameplz.baedal.domain.web.admin.dto.response.StoreAdminResponseDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ public class AdminController {
     private final StoreRepository storeRepository;
     private final CategoryRepository categoryRepository;
     private final TerritoryRepository territoryRepository;
+    private final OrderRepository orderRepository;
 
     /*
      *  TODO: 관리자 페이지 접근 제어
@@ -43,9 +47,7 @@ public class AdminController {
     @GetMapping("store")
     public String storePage(Model model) {
 
-        Sort.Direction direction = Sort.Direction.DESC;
-        Sort sort = Sort.by(direction, "createdAt");
-        PageRequest pageable = PageRequest.of(0, 100, sort);
+        PageRequest pageable = getPageRequestInfo();
 
         Page<Store> storeListFromDB = storeRepository.findAll(pageable);
 
@@ -60,9 +62,7 @@ public class AdminController {
 
     @GetMapping("category")
     public String categoryPage(Model model) {
-        Sort.Direction direction = Sort.Direction.DESC;
-        Sort sort = Sort.by(direction, "createdAt");
-        PageRequest pageable = PageRequest.of(0, 100, sort);
+        PageRequest pageable = getPageRequestInfo();
 
         Page<Category> categoryList = categoryRepository.findAll(pageable);
         List<CategoryAdminResponseDto> list = categoryList.stream().map(category ->
@@ -76,9 +76,7 @@ public class AdminController {
 
     @GetMapping("territory")
     public String territoryPage(Model model) {
-        Sort.Direction direction = Sort.Direction.DESC;
-        Sort sort = Sort.by(direction, "createdAt");
-        PageRequest pageable = PageRequest.of(0, 100, sort);
+        PageRequest pageable = getPageRequestInfo();
 
         Page<Territory> territoryList = territoryRepository.findAll(pageable);
         List<CategoryAdminResponseDto> list = territoryList.stream().map(category ->
@@ -87,6 +85,26 @@ public class AdminController {
 
         model.addAttribute("list", list);
         return "page/territory";
+    }
+
+    @GetMapping("order")
+    public String orderListPage(Model model) {
+        PageRequest pageable = getPageRequestInfo();
+
+        Page<Order> orderList = orderRepository.findAll(pageable);
+        List<OrderAdminResponseDto> list = orderList.stream().map(order ->
+            new OrderAdminResponseDto(order.getId().toString(), order.getOrderStatus(),
+                order.getAddress(),
+                order.getDeletedAt(), order.getCreatedAt())).toList();
+
+        model.addAttribute("list", list);
+        return "page/order";
+    }
+
+    private PageRequest getPageRequestInfo() {
+        Sort.Direction direction = Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, "createdAt");
+        return PageRequest.of(0, 100, sort);
     }
 
 }

@@ -87,7 +87,7 @@ public class CategoryController {
     public CommonResponse<CategoryIdResponseDto> cancelDeleteCategory(
         @PathVariable("id") UUID categoryId
     ) {
-
+        //TODO: 마스터만 호출할 수 있도록 추가
         String deletedCategoryId = categoryService.cancelCategoryId(categoryId);
         return CommonResponse.success(new CategoryIdResponseDto(deletedCategoryId));
     }

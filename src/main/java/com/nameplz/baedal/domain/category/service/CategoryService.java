@@ -22,10 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CategoryService {
 
-    //
+    // Repository
     private final CategoryRepository categoryRepository;
     private final StoreRepository storeRepository;
-    //
+    // Mapper
     private final CategoryMapper categoryMapper;
 
     /**
