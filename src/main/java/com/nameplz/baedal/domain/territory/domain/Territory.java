@@ -42,6 +42,7 @@ public class Territory extends BaseEntity {
         name = newTerritoryName;
     }
 
+    // 지역 삭제 취소
     public void cancelDeleteTerritory() {
         deletedAt = null;
         deletedUser = null;
