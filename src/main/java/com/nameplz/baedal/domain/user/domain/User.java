@@ -1,13 +1,9 @@
 package com.nameplz.baedal.domain.user.domain;
 
 import com.nameplz.baedal.domain.model.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.nameplz.baedal.domain.user.dto.request.UserUpdateRequestDto;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -28,22 +24,34 @@ public class User extends BaseEntity {
     @Column(name = "password")
     private String password;
 
+    @Enumerated(EnumType.STRING)  // This will store the enum name as a string in the database
     @Column(name = "role")
     private UserRole role;
 
     @Column(name = "is_public")
     private boolean isPublic;
 
-    public static User create(String username, String nickname, String email, String password, UserRole role) {
+    public static User create(String username, String password) {
 
         User user = new User();
 
         user.username = username;
-        user.nickname = nickname;
-        user.email = email;
         user.password = password;
-        user.role = role;
+        user.role = UserRole.CUSTOMER;
 
         return user;
+    }
+
+    public void update(UserUpdateRequestDto request) {
+        this.nickname = request.nickname();
+        this.email = request.email();
+        // 비밀번호는 이미 인코딩된 상태로 받아서 처리
+        this.password = request.password(); // 비밀번호는 인코딩된 상태로 설정
+        this.isPublic = request.isPublic();
+    }
+
+    // 비밀번호 업데이트 메서드
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
     }
 }
