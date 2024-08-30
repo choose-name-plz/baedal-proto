@@ -1,5 +1,7 @@
 package com.nameplz.baedal.domain.territory.service;
 
+import com.nameplz.baedal.domain.store.domain.Store;
+import com.nameplz.baedal.domain.store.repository.StoreRepository;
 import com.nameplz.baedal.domain.territory.domain.Territory;
 import com.nameplz.baedal.domain.territory.dto.response.TerritoryResponseDto;
 import com.nameplz.baedal.domain.territory.mapper.TerritoryMapper;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class TerritoryService {
 
     private final TerritoryRepository territoryRepository;
+    private final StoreRepository storeRepository;
+
     private final TerritoryMapper territoryMapper;
 
     /**
@@ -41,7 +46,7 @@ public class TerritoryService {
      */
     @Transactional
     public TerritoryResponseDto updateTerritory(UUID territoryId, String territoryName) {
-        Territory territory = findTerritoryById(territoryId);
+        Territory territory = findTerritoryByIdAndCheck(territoryId);
         territory.updateTerritoryName(territoryName);
         return territoryMapper.categoryToResponseDto(territory);
     }
@@ -51,8 +56,25 @@ public class TerritoryService {
      */
     @Transactional
     public String deleteTerritory(UUID territoryId, String username) {
-        Territory territory = findTerritoryById(territoryId);
+        Territory territory = findTerritoryByIdAndCheck(territoryId);
+
+        // 지역에 맞춰서 사용중인지 확인
+        PageRequest pageable = PageRequest.of(0, 5);
+        List<Store> storeList = storeRepository.findStoreList(null, null, territoryId, null,
+            pageable);
+        if (!storeList.isEmpty()) {
+            throw new GlobalException(ResultCase.TERRITORY_IS_USED);
+        }
+
         territory.deleteEntity(username);
+        return territory.getId().toString();
+    }
+
+    @Transactional
+    public String cancelTerritoryId(UUID territoryId) {
+        Territory territory = territoryRepository.findById(territoryId)
+            .orElseThrow(() -> new GlobalException(ResultCase.TERRITORY_NOT_FOUND));
+        territory.cancelDeleteTerritory();
         return territory.getId().toString();
     }
 
@@ -64,7 +86,7 @@ public class TerritoryService {
         return territoryMapper.listTerritoryToResponseDto(territoryList);
     }
 
-    private Territory findTerritoryById(UUID territoryId) {
+    private Territory findTerritoryByIdAndCheck(UUID territoryId) {
         return territoryRepository.findByIdAndDeletedAtIsNull(territoryId)
             .orElseThrow(() -> new GlobalException(ResultCase.TERRITORY_NOT_FOUND));
     }

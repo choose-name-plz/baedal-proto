@@ -42,4 +42,9 @@ public class Territory extends BaseEntity {
         name = newTerritoryName;
     }
 
+    public void cancelDeleteTerritory() {
+        deletedAt = null;
+        deletedUser = null;
+    }
+
 }

@@ -42,4 +42,10 @@ public class Category extends BaseEntity {
     public void updateCategoryName(String newCategoryName) {
         this.name = newCategoryName;
     }
+
+    // 삭제된 카테고리 복구
+    public void cancelDeleteCategory() {
+        this.deletedAt = null;
+        this.deletedUser = null;
+    }
 }

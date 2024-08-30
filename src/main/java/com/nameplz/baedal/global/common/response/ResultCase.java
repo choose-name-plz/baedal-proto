@@ -55,7 +55,12 @@ public enum ResultCase {
 
     /* 카테고리 및 지역 6000 번대*/
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 6000, "카테고리 정보를 찾을 수 없습니다."),
-    TERRITORY_NOT_FOUND(HttpStatus.NOT_FOUND, 6001, "지역 정보를 찾을 수 없습니다.");
+    TERRITORY_NOT_FOUND(HttpStatus.NOT_FOUND, 6100, "지역 정보를 찾을 수 없습니다."),
+
+    CATEGORY_IS_USED(HttpStatus.BAD_REQUEST, 6001, "이미 사용중인 카테고리입니다."),
+    TERRITORY_IS_USED(HttpStatus.BAD_REQUEST, 6101, "이미 사용중인 지역정보입니다."),
+
+    ;
 
 
     private final HttpStatus httpStatus; // 응답 상태 코드

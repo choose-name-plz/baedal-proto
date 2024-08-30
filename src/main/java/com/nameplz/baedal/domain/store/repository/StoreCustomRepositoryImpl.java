@@ -25,7 +25,8 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
     private final JPAQueryFactory query;
 
     @Override
-    public List<Store> findStoreList(String title, UUID categoryId, StoreStatus status,
+    public List<Store> findStoreList(String title, UUID categoryId, UUID territoryId,
+        StoreStatus status,
         Pageable pageable) {
 
         BooleanBuilder builder = new BooleanBuilder();
@@ -41,6 +42,11 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
             builder.and(store.category.id.eq(categoryId));
         }
 
+        // 지역 검색
+        if (territoryId != null) {
+            builder.and(store.territory.id.eq(territoryId));
+        }
+
         // 가게 상태 검색
         if (status != null) {
             builder.and(store.status.eq(status));
@@ -51,6 +57,7 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
             .from(store)
             .leftJoin(store.category, QCategory.category)
             .fetchJoin()
+            .where(builder)
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .orderBy(storeSort(pageable))
