@@ -8,9 +8,12 @@ import com.nameplz.baedal.domain.store.domain.Store;
 import com.nameplz.baedal.domain.store.repository.StoreRepository;
 import com.nameplz.baedal.domain.territory.domain.Territory;
 import com.nameplz.baedal.domain.territory.repository.TerritoryRepository;
+import com.nameplz.baedal.domain.user.domain.User;
+import com.nameplz.baedal.domain.user.repository.UserRepository;
 import com.nameplz.baedal.domain.web.admin.dto.response.CategoryAdminResponseDto;
 import com.nameplz.baedal.domain.web.admin.dto.response.OrderAdminResponseDto;
 import com.nameplz.baedal.domain.web.admin.dto.response.StoreAdminResponseDto;
+import com.nameplz.baedal.domain.web.admin.dto.response.UserAdminRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,16 +35,31 @@ public class AdminController {
     private final CategoryRepository categoryRepository;
     private final TerritoryRepository territoryRepository;
     private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
 
     /*
      *  TODO: 관리자 페이지 접근 제어
      */
 
     @GetMapping
-
     public String mainPage() {
 
         return "home";
+    }
+
+    @GetMapping("user")
+    public String userPage(Model model) {
+        PageRequest pageable = getPageRequestInfo();
+
+        Page<User> userList = userRepository.findAll(pageable);
+
+        List<UserAdminRepository> list = userList.stream().map(
+            user -> new UserAdminRepository(user.getUsername(), user.getRole(),
+                user.getDeletedAt(),
+                user.getCreatedAt())).toList();
+
+        model.addAttribute("list", list);
+        return "page/user";
     }
 
     @GetMapping("store")
