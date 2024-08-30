@@ -47,6 +47,11 @@ public class AdminController {
         return "home";
     }
 
+    @GetMapping("login")
+    public String loginPage() {
+        return "login";
+    }
+
     @GetMapping("user")
     public String userPage(Model model) {
         PageRequest pageable = getPageRequestInfo();
