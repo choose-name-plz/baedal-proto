@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface StoreCustomRepository {
 
-    List<Store> findStoreList(String title, UUID categoryId, StoreStatus status, Pageable pageable);
+    List<Store> findStoreList(String title, UUID categoryId, UUID territoryId, StoreStatus status,
+        Pageable pageable);
 
 }

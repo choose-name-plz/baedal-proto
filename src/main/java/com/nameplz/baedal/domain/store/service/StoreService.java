@@ -146,7 +146,9 @@ public class StoreService {
             findCategoryByIdAndCheck(categoryId);
         }
 
-        List<Store> storeList = storeRepository.findStoreList(title, categoryId, status, pageable);
+        // 지역은 확장 시 추후 구현
+        List<Store> storeList = storeRepository.findStoreList(title, categoryId, null, status,
+            pageable);
 
         List<StoreResponseDto> output = new ArrayList<>();
         for (Store store : storeList) {

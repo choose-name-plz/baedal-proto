@@ -9,11 +9,10 @@ import com.nameplz.baedal.global.common.response.CommonResponse;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,12 +32,11 @@ public class CategoryController {
         카테고리 생성
      */
     @PostMapping
-    public ResponseEntity<CommonResponse<CategoryIdResponseDto>> addCategory(
+    public CommonResponse<CategoryIdResponseDto> addCategory(
         @RequestBody @Validated CategoryAddRequestDto requestBody) {
         //TODO: 마스터만 호출할 수 있도록 추가
         String categoryId = categoryService.addCategory(requestBody.name());
-        return new ResponseEntity<>(
-            CommonResponse.success(new CategoryIdResponseDto(categoryId)), HttpStatus.CREATED);
+        return CommonResponse.success(new CategoryIdResponseDto(categoryId));
     }
 
     /*
@@ -81,4 +79,17 @@ public class CategoryController {
 
         return CommonResponse.success(new CategoryIdResponseDto(deleteCategoryId));
     }
+
+    /*
+     * 카테고리 삭제 취소
+     */
+    @PatchMapping("/{id}/delete-cancel")
+    public CommonResponse<CategoryIdResponseDto> cancelDeleteCategory(
+        @PathVariable("id") UUID categoryId
+    ) {
+        //TODO: 마스터만 호출할 수 있도록 추가
+        String deletedCategoryId = categoryService.cancelCategoryId(categoryId);
+        return CommonResponse.success(new CategoryIdResponseDto(deletedCategoryId));
+    }
+
 }

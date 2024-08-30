@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>주문 관리</title>
+  <link href="/css/list-styles.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <!-- 페이지 제목 -->
+  <header class="page-header">
+    <h1>주문 관리</h1>
+    <div class="breadcrumb">
+      <a href="/admin">홈</a>
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- 테이블 상단의 기능 버튼들 -->
+    <div class="table-controls">
+      <div class="search-box">
+        <label for="search">Search:</label>
+        <input id="search" placeholder="검색어를 입력하세요" type="text">
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+      <tr>
+        <th>Id</th>
+        <th>주문 상태</th>
+        <th>도로명</th>
+        <th>상세 주소</th>
+        <th>삭제 여부</th>
+        <th>생성 날짜</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="order, stat : ${list}">
+        <td th:text="${order.id}">1</td>
+        <td th:text="${order.status}">주문 상태</td>
+        <td th:text="${order.address.roadAddress}">도로명 주소</td>
+        <td th:text="${order.address.detailAddress}">상세 주소</td>
+        <td th:if="${order.deletedAt != null}"
+            th:text="${#temporals.format(order.deletedAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:if="${order.deletedAt == null}"></td>
+        <td th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}">2024-08-08</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>카테고리 관리</title>
+  <link href="/css/list-styles.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <header class="page-header">
+    <h1>카테고리 관리</h1>
+    <div class="breadcrumb">
+      <a href="/admin">홈</a>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="table-controls">
+      <div class="add-box">
+        <label for="categoryInput">카테고리 추가:</label>
+        <input id="categoryInput" placeholder="카테고리를 입력하세요" type="text">
+        <button onclick="addCategory(document.getElementById('categoryInput').value)"> 카테고리 추가
+        </button>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+      <tr>
+        <th>Id</th>
+        <th>카테고리 이름</th>
+        <th>삭제 여부</th>
+        <th>생성 날짜</th>
+        <th>삭제 변경</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="category, stat : ${list}">
+        <td th:text="${category.id}">1</td>
+        <td th:text="${category.name}">카테고리 제목</td>
+        <td th:if="${category.deletedAt != null}"
+            th:text="${#temporals.format(category.deletedAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:if="${category.deletedAt == null}"></td>
+        <td th:text="${#temporals.format(category.createdAt, 'yyyy-MM-dd HH:mm')}">2024-08-08</td>
+        <td th:if="${category.deletedAt != null}">
+          <button class="cd-button"
+                  th:categoryId="${category.id}"
+                  th:onclick="restoreCategory(this.getAttribute('categoryId'))">삭제 취소 진행
+          </button>
+        </td>
+        <td th:if="${category.deletedAt == null}">
+          <button class="d-button"
+                  th:categoryId="${category.id}"
+                  th:onclick="deleteCategory(this.getAttribute('categoryId'))">삭제 진행
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+  function addCategory(categoryName) {
+    if (!categoryName) {
+            alert('카테고리를 입력하세요.');
+            return;
+    }
+
+    fetch('/category', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: categoryName })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('네트워크 응답이 올바르지 않습니다: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('카테고리 추가 성공:', data);
+            location.reload(true);
+        })
+        .catch(error => {
+            console.error('카테고리 추가 중 오류 발생:', error);
+            alert('카테고리 추가에 실패했습니다. 다시 시도해주세요.');
+        });
+  }
+
+  function deleteCategory(id) {
+    if (!confirm('정말 삭제하시겠습니까?')) {
+        return;
+    }
+
+    // API 호출
+    fetch('/category/' + id, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('네트워크 응답이 올바르지 않습니다: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('삭제 성공:', data);
+
+        location.reload(true);
+    })
+    .catch(error => {
+        console.error('삭제 중 오류 발생:', error);
+        alert('삭제에 실패했습니다. 다시 시도해주세요.');
+    });
+  }
+
+  function restoreCategory(id) {
+    if (!confirm('정말 삭제를 취소하시겠습니까?')) {
+        return;
+    }
+
+    // API 호출
+    fetch('/category/' + id + '/delete-cancel', {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('네트워크 응답이 올바르지 않습니다: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('취소 성공:', data);
+
+        location.reload(true);
+    })
+    .catch(error => {
+        console.error('삭제 취소 중 오류 발생:', error);
+        alert('삭제 취소에 실패했습니다. 다시 시도해주세요.');
+    });
+  }
+
+</script>
+</body>
+</html>

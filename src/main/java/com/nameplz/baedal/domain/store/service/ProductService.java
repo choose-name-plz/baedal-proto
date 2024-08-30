@@ -67,7 +67,7 @@ public class ProductService {
             if (!requestDto.storeId().equals(storeId)) {
                 log.error("잘못된 Store의 상품이 입력되었습니다. 원래 상품 : {}  잘못입력 상품 : {}", storeId,
                     requestDto.storeId());
-                throw new GlobalException(ResultCase.INVALID_INPUT);
+                throw new GlobalException(ResultCase.PRODUCT_NOT_MATCH_STORE_IN_BATCH);
             }
             productList.add(Product.createProduct(requestDto.name(), requestDto.description(),
                 requestDto.price(), requestDto.image(), store));

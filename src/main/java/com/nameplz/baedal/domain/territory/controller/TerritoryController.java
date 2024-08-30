@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -77,6 +78,18 @@ public class TerritoryController {
         String username = "iron";
         String deletedTerritoryId = territoryService.deleteTerritory(territoryId, username);
 
+        return CommonResponse.success(new TerritoryIdResponseDto(deletedTerritoryId));
+    }
+
+    /**
+     * territory 삭제 취소
+     */
+    @PatchMapping("/{id}/delete-cancel")
+    public CommonResponse<TerritoryIdResponseDto> cancelDeleteCategory(
+        @PathVariable("id") UUID territoryId
+    ) {
+        // TODO: 마스터만 호출할 수 있도록 추가
+        String deletedTerritoryId = territoryService.cancelTerritoryId(territoryId);
         return CommonResponse.success(new TerritoryIdResponseDto(deletedTerritoryId));
     }
 
