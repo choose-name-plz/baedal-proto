@@ -1,5 +1,6 @@
 package com.nameplz.baedal.global.common.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +14,11 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class CommonResponse<T> implements Serializable {
 
+    @Schema(description = "응답 코드", example = "0")
     private Integer code; // 커스텀 응답 코드
+    @Schema(description = "응답 메시지", example = "정상 처리 되었습니다.")
     private String message; // 응답에 대한 설명
+    @Schema(description = "응답 데이터", example = "{}")
     private T data; // 응답에 필요한 데이터
 
     /**

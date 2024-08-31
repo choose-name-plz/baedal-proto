@@ -1,28 +1,23 @@
 package com.nameplz.baedal.global.common.jwt;
 
 import com.nameplz.baedal.domain.user.domain.UserRole;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 /**
  * jwt 관련 기능들을 가진 클래스, jwt Util 만드는 중 (특정 파라미터에 대한 작업을 수행하는 메소드들이 있는 곳) (다른 객체에 의존하지 않고 하나의 모듈로써
@@ -61,13 +56,13 @@ public class JwtUtil {
         Date date = new Date();
 
         return BEARER_PREFIX +
-            Jwts.builder()
-                .subject(username) // 사용자 식별자값(ID)
-                .claim(AUTHORIZATION_KEY, role) // 사용자 권한
-                .expiration(new Date(date.getTime() + TOKEN_TIME)) // 만료 시간
-                .issuedAt(date) // 발급일
-                .signWith(key) // 암호화 알고리즘
-                .compact();
+               Jwts.builder()
+                       .subject(username) // 사용자 식별자값(ID)
+                       .claim(AUTHORIZATION_KEY, role) // 사용자 권한
+                       .expiration(new Date(date.getTime() + TOKEN_TIME)) // 만료 시간
+                       .issuedAt(date) // 발급일
+                       .signWith(key) // 암호화 알고리즘
+                       .compact();
     }
 
     // 2. jWT를 쿠키에 저장
@@ -75,7 +70,7 @@ public class JwtUtil {
         try {
             // TODO : utf-8을 하드코딩 하기보다 StandardCharsets.UTF_8.name() 를 사용하면 좋을 것 같습니다!
             token = URLEncoder.encode(token, "utf-8")
-                .replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
+                    .replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
 
             Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token); // Name-Value
             cookie.setPath("/");
@@ -131,7 +126,7 @@ public class JwtUtil {
                 if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
                     try {
                         return URLDecoder.decode(cookie.getValue(),
-                            "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
+                                "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
                     } catch (UnsupportedEncodingException e) {
                         return null;
                     }
