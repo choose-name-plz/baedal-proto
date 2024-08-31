@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>유저 관리</title>
+  <link href="/css/list-styles.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <header class="page-header">
+    <h1>유저 관리</h1>
+    <div class="breadcrumb">
+      <a href="/admin">홈으로</a>
+    </div>
+  </header>
+
+  <div class="content">
+    <table class="data-table">
+      <thead>
+      <tr>
+        <th>유저 이름</th>
+        <th>유저 권한</th>
+        <th>삭제 여부</th>
+        <th>생성 날짜</th>
+        <th>권한 변경</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="user, stat : ${list}">
+        <td th:text="${user.username}">유저 이름</td>
+        <td th:text="${user.role}">유저 권한</td>
+        <!-- 삭제 여부 -->
+        <td th:if="${user.deletedAt != null}"
+            th:text="${#temporals.format(user.deletedAt, 'yyyy-MM-dd HH:mm')}">삭제된 유저
+        </td>
+        <td th:if="${user.deletedAt == null}"> 살아있는 유저</td>
+        <!-- 생성 날짜 -->
+        <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">2024-08-08</td>
+        <td th:if="${!#strings.equals(user.role, 'MASTER')}">
+          <button class="d-button"
+                  th:onclick="restoreCategory(this.getAttribute('username'))"
+                  th:username="${user.username}">마스터로
+          </button>
+        </td>
+        <td th:if="${#strings.equals(user.role, 'MASTER')}">
+          <button class="cd-button"
+                  th:onclick="deleteCategory(this.getAttribute('username'))"
+                  th:username="${user.username}">일반 유저로
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+  function deleteCategory(id) {
+    if (!confirm('정말 삭제하시겠습니까?')) {
+        return;
+    }
+
+    // API 호출
+    fetch('/category/' + id, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('네트워크 응답이 올바르지 않습니다: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('삭제 성공:', data);
+
+        location.reload(true);
+    })
+    .catch(error => {
+        console.error('삭제 중 오류 발생:', error);
+        alert('삭제에 실패했습니다. 다시 시도해주세요.');
+    });
+  }
+
+  function restoreCategory(id) {
+    if (!confirm('정말 삭제를 취소하시겠습니까?')) {
+        return;
+    }
+
+    // API 호출
+    fetch('/category/' + id + '/delete-cancel', {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('네트워크 응답이 올바르지 않습니다: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('취소 성공:', data);
+
+        location.reload(true);
+    })
+    .catch(error => {
+        console.error('삭제 취소 중 오류 발생:', error);
+        alert('삭제 취소에 실패했습니다. 다시 시도해주세요.');
+    });
+  }
+
+</script>
+</body>
+</html>

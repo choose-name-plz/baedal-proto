@@ -11,7 +11,7 @@
   <header class="page-header">
     <h1>주문 관리</h1>
     <div class="breadcrumb">
-      <a href="/admin">홈</a>
+      <a href="/admin">홈으로</a>
     </div>
   </header>
 
@@ -33,6 +33,7 @@
         <th>상세 주소</th>
         <th>삭제 여부</th>
         <th>생성 날짜</th>
+        <th>주문 강제 취소</th>
       </tr>
       </thead>
       <tbody>
@@ -45,11 +46,51 @@
             th:text="${#temporals.format(order.deletedAt, 'yyyy-MM-dd HH:mm')}"></td>
         <td th:if="${order.deletedAt == null}"></td>
         <td th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}">2024-08-08</td>
+        <td th:if="${!#strings.equals(order.status, 'CANCELED')}">
+          <button class="d-button"
+                  th:onclick="cancelOrder(this.getAttribute('orderId'))"
+                  th:orderId="${order.id}">주문 강제 종료
+          </button>
+        </td>
+        <td th:if="${#strings.equals(order.status, 'CANCELED')}">
+          <!-- 닫혔으면 아무것도 하지 않는다. -->
+        </td>
       </tr>
       </tbody>
     </table>
   </div>
 </div>
+
+<script>
+  function cancelOrder(id) {
+    if (!confirm('정말 주문을 취소 시키시겠습니까?')) {
+        return;
+    }
+
+    // API 호출
+    fetch('/orders/' + id , {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('네트워크 응답이 올바르지 않습니다: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('취소 성공:', data);
+
+        location.reload(true);
+    })
+    .catch(error => {
+        console.error('삭제 취소 중 오류 발생:', error);
+        alert('삭제 취소에 실패했습니다. 다시 시도해주세요.');
+    });
+  }
+</script>
 
 </body>
 </html>
