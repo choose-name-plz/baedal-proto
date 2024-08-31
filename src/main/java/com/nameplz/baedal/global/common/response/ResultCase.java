@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ResultCase {
 
     /* 성공 0번대 - 모든 성공 응답을 200으로 통일 */
-    SUCCESS(HttpStatus.OK, 0, "정상 처리 되었습니다"),
+    SUCCESS(HttpStatus.OK, 0, "정상 처리 되었습니다."),
 
     /* 글로벌 1000번대 */
 
