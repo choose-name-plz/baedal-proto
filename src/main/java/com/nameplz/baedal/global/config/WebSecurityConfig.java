@@ -118,12 +118,15 @@ public class WebSecurityConfig {
      */
     private void settingRequestAuthorization(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authz ->
-                authz
-                        // 정적 파일
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        // 그 외
-                        .anyRequest().permitAll() // TODO : 인증 구현 후 authenticated()로 변경
+            authz
+                // 정적 파일
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                // Swagger UI
+                .requestMatcher("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/users/**").permitAll()
+                .requestMatchers("/admin/login").permitAll()
+                // 그 외
+                .anyRequest().authenticated() // TODO : 인증 구현 후 authenticated()로 변경
         );
     }
 }

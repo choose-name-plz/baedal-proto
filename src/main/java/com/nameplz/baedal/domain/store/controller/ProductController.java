@@ -9,10 +9,14 @@ import com.nameplz.baedal.domain.store.dto.response.ProductIdResponseDto;
 import com.nameplz.baedal.domain.store.dto.response.ProductListResponseDto;
 import com.nameplz.baedal.domain.store.dto.response.ProductResponseDto;
 import com.nameplz.baedal.domain.store.service.ProductService;
+import com.nameplz.baedal.domain.user.domain.User;
+import com.nameplz.baedal.domain.user.domain.UserRole.Authority;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.CommonResponse;
 import com.nameplz.baedal.global.common.response.EmptyResponseDto;
 import com.nameplz.baedal.global.common.response.ResultCase;
+import com.nameplz.baedal.global.common.security.UserDetailsImpl;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +26,9 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -36,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @Slf4j
+@Tag(name = "상품")
 @RequiredArgsConstructor
 @RequestMapping("products")
 @RestController
@@ -46,13 +54,14 @@ public class ProductController {
     /*
         Product 생성
      */
+    @Secured({Authority.OWNER, Authority.MASTER})
     @PostMapping
     public CommonResponse<ProductIdResponseDto> createProduct(
-        @RequestBody @Validated ProductCreateRequestDto requestDto
+        @RequestBody @Validated ProductCreateRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails userDetails
     ) {
-        //TODO: Owner만 접근 하도록 권한관리
-        String username = "iron";
-        String productId = productService.createProduct(username, requestDto.name(),
+        User user = ((UserDetailsImpl) userDetails).getUser();
+        String productId = productService.createProduct(user, requestDto.name(),
             requestDto.description(),
             requestDto.price(), requestDto.image(), requestDto.storeId());
         return CommonResponse.success(new ProductIdResponseDto(productId));
@@ -62,14 +71,15 @@ public class ProductController {
         Product 일괄 생성
         하나의 가게에 대해서만 일괄저장 하도록 설정
      */
+    @Secured({Authority.OWNER, Authority.MASTER})
     @PostMapping("/batch")
     public CommonResponse<ProductIdListResponseDto> createProductList(
-        @RequestBody @Validated ProductListCreateRequestDto requestDto
+        @RequestBody @Validated ProductListCreateRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails userDetails
     ) {
-        //TODO: Owner만 접근 하도록 권한관리
-        String username = "iron";
+        User user = ((UserDetailsImpl) userDetails).getUser();
         List<ProductIdResponseDto> productIdList = productService.createProductBatch(
-            username,
+            user,
             requestDto.productList(),
             requestDto.storeId());
         return CommonResponse.success(new ProductIdListResponseDto(productIdList));
@@ -80,11 +90,11 @@ public class ProductController {
      * Product 전체 목록을 갖고 온다.
      * /products?size=10&sort=createdAt,desc
      */
+    @Secured({Authority.MASTER})
     @GetMapping
     public CommonResponse<ProductListResponseDto> findProductList(
         @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable
     ) {
-        //TODO: 관리자 용
         List<ProductResponseDto> productList = productService.findProductList(pageable);
 
         return CommonResponse.success(
@@ -105,14 +115,15 @@ public class ProductController {
     /*
         Product 업데이트
      */
+    @Secured({Authority.OWNER, Authority.MASTER})
     @PutMapping("/{id}")
     public CommonResponse<ProductResponseDto> updateProduct(
         @PathVariable("id") UUID productId,
-        @RequestBody @Validated ProductUpdateRequestDto requestDto
+        @RequestBody @Validated ProductUpdateRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails userDetails
     ) {
-        //TODO: Owner만 접근 하도록 권한관리
-        String username = "iron";
-        ProductResponseDto product = productService.updateProduct(username, productId,
+        User user = ((UserDetailsImpl) userDetails).getUser();
+        ProductResponseDto product = productService.updateProduct(user, productId,
             requestDto.name(),
             requestDto.description(),
             requestDto.image(), requestDto.isPublic());
@@ -124,15 +135,16 @@ public class ProductController {
     /*
         Product 상태 변경 on/off
      */
+    @Secured({Authority.OWNER, Authority.MASTER})
     @PatchMapping("/{id}/status")
     public CommonResponse<ProductResponseDto> updateProductStatus(
         @PathVariable("id") UUID productId,
-        @RequestBody @Validated ProductUpdateStatusRequestDto requestDto
+        @RequestBody @Validated ProductUpdateStatusRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails userDetails
     ) {
-
-        //TODO: Owner만 접근 하도록 권한관리
-        String username = "iron";
-        ProductResponseDto productResponseDto = productService.updateProductStatus(productId,
+        User user = ((UserDetailsImpl) userDetails).getUser();
+        ProductResponseDto productResponseDto = productService.updateProductStatus(user,
+            productId,
             requestDto.isPublic());
 
         return CommonResponse.success(productResponseDto);
@@ -141,12 +153,13 @@ public class ProductController {
     /*
         Product 삭제
      */
+    @Secured({Authority.OWNER, Authority.MASTER})
     @DeleteMapping("/{id}")
     public CommonResponse<ProductIdResponseDto> deleteProduct(
-        @PathVariable("id") UUID productId
+        @PathVariable("id") UUID productId,
+        @AuthenticationPrincipal UserDetails userDetails
     ) {
-        //TODO: 유저에 맞게 변경
-        String user = "username";
+        User user = ((UserDetailsImpl) userDetails).getUser();
         String deletedProduct = productService.deleteProduct(productId, user);
 
         return CommonResponse.success(new ProductIdResponseDto(deletedProduct));

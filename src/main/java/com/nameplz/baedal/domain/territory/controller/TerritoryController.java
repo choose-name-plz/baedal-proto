@@ -6,6 +6,7 @@ import com.nameplz.baedal.domain.territory.dto.response.TerritoryIdResponseDto;
 import com.nameplz.baedal.domain.territory.dto.response.TerritoryResponseDto;
 import com.nameplz.baedal.domain.territory.service.TerritoryService;
 import com.nameplz.baedal.global.common.response.CommonResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "지역")
 @RequiredArgsConstructor
 @RequestMapping("territory")
 @RestController
