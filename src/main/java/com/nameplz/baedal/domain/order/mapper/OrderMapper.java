@@ -12,9 +12,13 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 @Mapper(componentModel = SPRING)
 public interface OrderMapper {
 
+    @Mapping(target = "productId", source = "product.id")
+    @Mapping(target = "orderId", source = "order.id")
     @Mapping(target = "orderLineId", source = "orderLine.id")
     OrderLineResponseDto toOrderLineResponseDto(OrderLine orderLine);
 
+    @Mapping(target = "storeId", source = "order.store.id")
+    @Mapping(target = "userId", source = "order.user.username")
     @Mapping(target = "orderId", source = "order.id")
     @Mapping(
             target = "orderLineList",
