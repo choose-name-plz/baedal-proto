@@ -13,10 +13,12 @@ import com.nameplz.baedal.domain.store.dto.response.StoreListResponseDto;
 import com.nameplz.baedal.domain.store.dto.response.StoreResponseDto;
 import com.nameplz.baedal.domain.store.service.ProductService;
 import com.nameplz.baedal.domain.store.service.StoreService;
+import com.nameplz.baedal.domain.user.domain.UserRole.Authority;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.CommonResponse;
 import com.nameplz.baedal.global.common.response.EmptyResponseDto;
 import com.nameplz.baedal.global.common.response.ResultCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,9 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
+@Tag(name = "상점")
 @RequiredArgsConstructor
 @RequestMapping("stores")
 @RestController
@@ -52,12 +58,13 @@ public class StoreController {
     /*
         Store 생성
      */
+    @Secured({Authority.CUSTOMER, Authority.MASTER})
     @PostMapping
     public CommonResponse<StoreIdResponseDto> createStore(
-        @RequestBody @Validated StoreCreateRequestDto requestDto) {
+        @RequestBody @Validated StoreCreateRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails userDetails) {
 
-        //TODO: Owner만 접근 하도록 권한관리
-        String user = "iron";
+        String username = userDetails.getUsername();
 
         String storeId = storeService.createStore(
             requestDto.title(),
@@ -65,7 +72,7 @@ public class StoreController {
             requestDto.image(),
             requestDto.territoryId(),
             requestDto.categoryId(),
-            user
+            username
         );
 
         return CommonResponse.success(new StoreIdResponseDto(storeId));
@@ -74,13 +81,15 @@ public class StoreController {
     /*
         Store 업데이트
      */
+    @Secured({Authority.OWNER, Authority.MASTER})
     @PutMapping("/{id}")
     public CommonResponse<StoreResponseDto> updateStore(
         @PathVariable("id") UUID storeId,
-        @RequestBody @Validated StoreUpdateRequestDto requestDto
+        @RequestBody @Validated StoreUpdateRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails userDetails
     ) {
-        //TODO: Owner만 접근 하도록 권한관리
-        String username = "iron";
+
+        String username = userDetails.getUsername();
         StoreResponseDto storeResponseDto = storeService.updateStore(username, storeId,
             requestDto.territoryId(), requestDto.categoryId(),
             requestDto.title(), requestDto.description(), requestDto.image(), requestDto.status());
@@ -91,13 +100,14 @@ public class StoreController {
     /*
      * 가게 상태 변경
      */
+    @Secured({Authority.OWNER, Authority.MASTER})
     @PatchMapping("/{id}/status")
     public CommonResponse<StoreResponseDto> updateStoreStatus(
         @PathVariable("id") UUID storeId,
-        @RequestBody StoreUpdateStatusRequestDto requestDto
+        @RequestBody StoreUpdateStatusRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails userDetails
     ) {
-        //TODO: Owner만 접근 하도록 권한관리
-        String username = "iron";
+        String username = userDetails.getUsername();
         StoreResponseDto storeResponseDto = storeService.updateStoreStatus(username, storeId,
             requestDto.status());
 
@@ -107,13 +117,14 @@ public class StoreController {
     /*
      * 가게 카테고리 변경
      */
+    @Secured({Authority.OWNER, Authority.MASTER})
     @PatchMapping("/{id}/category")
     public CommonResponse<StoreResponseDto> updateStoreCategory(
         @PathVariable("id") UUID storeId,
-        @RequestBody StoreUpdateCategoryRequestDto requestDto
+        @RequestBody StoreUpdateCategoryRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails userDetails
     ) {
-        //TODO: Owner만 접근 하도록 권한관리
-        String username = "iron";
+        String username = userDetails.getUsername();
         StoreResponseDto storeResponseDto = storeService.updateStoreTerritory(username, storeId,
             requestDto.categoryId());
 
@@ -124,13 +135,14 @@ public class StoreController {
     /*
      * 가게 지역 변경
      */
+    @Secured({Authority.OWNER, Authority.MASTER})
     @PatchMapping("/{id}/territory")
     public CommonResponse<StoreResponseDto> updateStoreTerritory(
         @PathVariable("id") UUID storeId,
-        @RequestBody StoreUpdateTerritoryRequestDto requestDto
+        @RequestBody StoreUpdateTerritoryRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails userDetails
     ) {
-        //TODO: 권한관리
-        String username = "iron";
+        String username = userDetails.getUsername();
         StoreResponseDto storeResponseDto = storeService.updateStoreTerritory(username, storeId,
             requestDto.territoryId());
 
@@ -140,12 +152,13 @@ public class StoreController {
     /*
         가게 삭제
      */
+    @Secured({Authority.OWNER, Authority.MASTER})
     @DeleteMapping("/{id}")
     public CommonResponse<StoreIdResponseDto> deleteStore(
-        @PathVariable("id") UUID storeId
+        @PathVariable("id") UUID storeId,
+        @AuthenticationPrincipal UserDetails userDetails
     ) {
-        //TODO: Owner만 접근 하도록 권한관리
-        String username = "iron";
+        String username = userDetails.getUsername();
         String deletedStoreId = storeService.deleteStore(username, storeId);
         return CommonResponse.success(new StoreIdResponseDto(deletedStoreId));
     }

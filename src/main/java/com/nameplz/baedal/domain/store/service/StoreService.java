@@ -10,6 +10,7 @@ import com.nameplz.baedal.domain.store.repository.StoreRepository;
 import com.nameplz.baedal.domain.territory.domain.Territory;
 import com.nameplz.baedal.domain.territory.repository.TerritoryRepository;
 import com.nameplz.baedal.domain.user.domain.User;
+import com.nameplz.baedal.domain.user.repository.UserRepository;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class StoreService {
 
     // repository
     private final StoreRepository storeRepository;
-    //    private final UserRepository userRepository;
+    private final UserRepository userRepository;
     private final TerritoryRepository territoryRepository;
     private final CategoryRepository categoryRepository;
 
@@ -46,6 +47,9 @@ public class StoreService {
         User user = findUserByIdAndCheck(username);
         Territory territory = findTerritoryByIdAndCheck(territoryId);
         Category category = findCategoryByIdAndCheck(categoryId);
+
+        // 유저를 가게 주인으로 변경
+        user.customerToOwner();
 
         Store store = Store.createStore(title, description, image, user, territory, category);
         storeRepository.save(store);
@@ -64,7 +68,8 @@ public class StoreService {
         Category category = findCategoryByIdAndCheck(categoryId);
         Store store = findStoreByIdAndCheck(storeId);
 
-        // TODO: 관리자거나 user하고 store 주인하고 같은지 확인
+        // 가게 주인인지 확인
+        checkStoreByUsername(username, store);
 
         store.updateStore(title, description, image, status, territory, category);
         return storeMapper.storeToDto(store, store.getCategory().getName());
@@ -78,7 +83,8 @@ public class StoreService {
     public StoreResponseDto updateStoreStatus(String username, UUID storeId, StoreStatus status) {
         Store store = findStoreByIdAndCheck(storeId);
 
-        // TODO: 관리자거나 user하고 store 주인하고 같은지 확인
+        // 가게 주인인지 확인
+        checkStoreByUsername(username, store);
 
         store.updateStoreStatus(status);
         return storeMapper.storeToDto(store, store.getCategory().getName());
@@ -93,7 +99,8 @@ public class StoreService {
         Category category = findCategoryByIdAndCheck(categoryId);
         Store store = findStoreByIdAndCheck(storeId);
 
-        // TODO: 관리자거나 user하고 store 주인하고 같은지 확인
+        // 가게 주인인지 확인
+        checkStoreByUsername(username, store);
         store.updateStoreCategory(category);
 
         return storeMapper.storeToDto(store, store.getCategory().getName());
@@ -107,7 +114,9 @@ public class StoreService {
         Territory territory = findTerritoryByIdAndCheck(territoryId);
         Store store = findStoreByIdAndCheck(storeId);
 
-        // TODO: 관리자거나 user하고 store 주인하고 같은지 확인
+        // 가게 주인인지 확인
+        checkStoreByUsername(username, store);
+
         store.updateStoreTerritory(territory);
 
         return storeMapper.storeToDto(store, store.getCategory().getName());
@@ -121,7 +130,9 @@ public class StoreService {
     public String deleteStore(String username, UUID storeId) {
         Store store = findStoreByIdAndCheck(storeId);
 
-        // TODO: user하고 store 주인하고 같은지 확인
+        // 가게 주인인지 확인
+        checkStoreByUsername(username, store);
+        
         store.deleteEntity(username);
         return store.getId().toString();
     }
@@ -162,13 +173,20 @@ public class StoreService {
     }
 
     /**
+     * 가게 주인이 맞는지 확인한다.
+     */
+    private void checkStoreByUsername(String username, Store store) {
+        if (!store.getUser().getUsername().equals(username)) {
+            throw new GlobalException(ResultCase.INVALID_INPUT);
+        }
+    }
+
+    /**
      * Id 별로 있는지 확인 후 불러오는 함수 모음
      */
     private User findUserByIdAndCheck(String username) {
-        //TODO 추후 합병
-        return null;
-//        return userRepository.findById(username)
-//            .orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
+        return userRepository.findById(username)
+            .orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
     }
 
     private Store findStoreByIdAndCheck(UUID storeId) {
