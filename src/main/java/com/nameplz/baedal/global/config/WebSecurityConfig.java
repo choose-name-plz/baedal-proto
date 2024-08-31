@@ -120,8 +120,10 @@ public class WebSecurityConfig {
             authz
                 // 정적 파일
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                .requestMatchers("/users/**").permitAll()
+                .requestMatchers("/admin/login").permitAll()
                 // 그 외
-                .anyRequest().permitAll() // TODO : 인증 구현 후 authenticated()로 변경
+                .anyRequest().authenticated() // TODO : 인증 구현 후 authenticated()로 변경
         );
     }
 }

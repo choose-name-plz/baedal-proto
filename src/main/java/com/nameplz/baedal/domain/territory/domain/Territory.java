@@ -4,6 +4,7 @@ import com.nameplz.baedal.domain.model.BaseEntity;
 import com.nameplz.baedal.domain.store.domain.Store;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,7 +16,9 @@ import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "p_teritory")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

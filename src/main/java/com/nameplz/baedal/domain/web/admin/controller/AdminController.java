@@ -9,6 +9,7 @@ import com.nameplz.baedal.domain.store.repository.StoreRepository;
 import com.nameplz.baedal.domain.territory.domain.Territory;
 import com.nameplz.baedal.domain.territory.repository.TerritoryRepository;
 import com.nameplz.baedal.domain.user.domain.User;
+import com.nameplz.baedal.domain.user.domain.UserRole.Authority;
 import com.nameplz.baedal.domain.user.repository.UserRepository;
 import com.nameplz.baedal.domain.web.admin.dto.response.CategoryAdminResponseDto;
 import com.nameplz.baedal.domain.web.admin.dto.response.OrderAdminResponseDto;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Slf4j
 @RequiredArgsConstructor
+@Secured({Authority.MASTER})
 @RequestMapping("admin")
 @Controller
 public class AdminController {
@@ -47,6 +50,8 @@ public class AdminController {
         return "home";
     }
 
+    // 로그인 페이지는 누구나 접근이 가능하게 한다.
+    @Secured({})
     @GetMapping("login")
     public String loginPage() {
         return "login";
