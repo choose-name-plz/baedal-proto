@@ -6,6 +6,7 @@ import com.nameplz.baedal.domain.order.dto.response.OrderResponseDto;
 import com.nameplz.baedal.domain.order.service.OrderService;
 import com.nameplz.baedal.global.common.response.CommonResponse;
 import com.nameplz.baedal.global.common.response.EmptyResponseDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "주문")
 @RequestMapping("/orders")
 public class OrderController {
 
