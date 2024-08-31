@@ -9,11 +9,13 @@ import com.nameplz.baedal.domain.store.dto.response.ProductIdResponseDto;
 import com.nameplz.baedal.domain.store.dto.response.ProductListResponseDto;
 import com.nameplz.baedal.domain.store.dto.response.ProductResponseDto;
 import com.nameplz.baedal.domain.store.service.ProductService;
+import com.nameplz.baedal.domain.user.domain.User;
 import com.nameplz.baedal.domain.user.domain.UserRole.Authority;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.CommonResponse;
 import com.nameplz.baedal.global.common.response.EmptyResponseDto;
 import com.nameplz.baedal.global.common.response.ResultCase;
+import com.nameplz.baedal.global.common.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -58,8 +60,8 @@ public class ProductController {
         @RequestBody @Validated ProductCreateRequestDto requestDto,
         @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String username = userDetails.getUsername();
-        String productId = productService.createProduct(username, requestDto.name(),
+        User user = ((UserDetailsImpl) userDetails).getUser();
+        String productId = productService.createProduct(user, requestDto.name(),
             requestDto.description(),
             requestDto.price(), requestDto.image(), requestDto.storeId());
         return CommonResponse.success(new ProductIdResponseDto(productId));
@@ -75,9 +77,9 @@ public class ProductController {
         @RequestBody @Validated ProductListCreateRequestDto requestDto,
         @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String username = userDetails.getUsername();
+        User user = ((UserDetailsImpl) userDetails).getUser();
         List<ProductIdResponseDto> productIdList = productService.createProductBatch(
-            username,
+            user,
             requestDto.productList(),
             requestDto.storeId());
         return CommonResponse.success(new ProductIdListResponseDto(productIdList));
@@ -120,8 +122,8 @@ public class ProductController {
         @RequestBody @Validated ProductUpdateRequestDto requestDto,
         @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String username = userDetails.getUsername();
-        ProductResponseDto product = productService.updateProduct(username, productId,
+        User user = ((UserDetailsImpl) userDetails).getUser();
+        ProductResponseDto product = productService.updateProduct(user, productId,
             requestDto.name(),
             requestDto.description(),
             requestDto.image(), requestDto.isPublic());
@@ -140,8 +142,8 @@ public class ProductController {
         @RequestBody @Validated ProductUpdateStatusRequestDto requestDto,
         @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String username = userDetails.getUsername();
-        ProductResponseDto productResponseDto = productService.updateProductStatus(username,
+        User user = ((UserDetailsImpl) userDetails).getUser();
+        ProductResponseDto productResponseDto = productService.updateProductStatus(user,
             productId,
             requestDto.isPublic());
 
@@ -157,7 +159,7 @@ public class ProductController {
         @PathVariable("id") UUID productId,
         @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String user = userDetails.getUsername();
+        User user = ((UserDetailsImpl) userDetails).getUser();
         String deletedProduct = productService.deleteProduct(productId, user);
 
         return CommonResponse.success(new ProductIdResponseDto(deletedProduct));

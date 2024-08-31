@@ -13,11 +13,13 @@ import com.nameplz.baedal.domain.store.dto.response.StoreListResponseDto;
 import com.nameplz.baedal.domain.store.dto.response.StoreResponseDto;
 import com.nameplz.baedal.domain.store.service.ProductService;
 import com.nameplz.baedal.domain.store.service.StoreService;
+import com.nameplz.baedal.domain.user.domain.User;
 import com.nameplz.baedal.domain.user.domain.UserRole.Authority;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.CommonResponse;
 import com.nameplz.baedal.global.common.response.EmptyResponseDto;
 import com.nameplz.baedal.global.common.response.ResultCase;
+import com.nameplz.baedal.global.common.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -64,7 +66,7 @@ public class StoreController {
         @RequestBody @Validated StoreCreateRequestDto requestDto,
         @AuthenticationPrincipal UserDetails userDetails) {
 
-        String username = userDetails.getUsername();
+        User user = ((UserDetailsImpl) userDetails).getUser();
 
         String storeId = storeService.createStore(
             requestDto.title(),
@@ -72,7 +74,7 @@ public class StoreController {
             requestDto.image(),
             requestDto.territoryId(),
             requestDto.categoryId(),
-            username
+            user
         );
 
         return CommonResponse.success(new StoreIdResponseDto(storeId));
@@ -89,8 +91,8 @@ public class StoreController {
         @AuthenticationPrincipal UserDetails userDetails
     ) {
 
-        String username = userDetails.getUsername();
-        StoreResponseDto storeResponseDto = storeService.updateStore(username, storeId,
+        User user = ((UserDetailsImpl) userDetails).getUser();
+        StoreResponseDto storeResponseDto = storeService.updateStore(user, storeId,
             requestDto.territoryId(), requestDto.categoryId(),
             requestDto.title(), requestDto.description(), requestDto.image(), requestDto.status());
 
@@ -107,8 +109,8 @@ public class StoreController {
         @RequestBody StoreUpdateStatusRequestDto requestDto,
         @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String username = userDetails.getUsername();
-        StoreResponseDto storeResponseDto = storeService.updateStoreStatus(username, storeId,
+        User user = ((UserDetailsImpl) userDetails).getUser();
+        StoreResponseDto storeResponseDto = storeService.updateStoreStatus(user, storeId,
             requestDto.status());
 
         return CommonResponse.success(storeResponseDto);
@@ -124,8 +126,8 @@ public class StoreController {
         @RequestBody StoreUpdateCategoryRequestDto requestDto,
         @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String username = userDetails.getUsername();
-        StoreResponseDto storeResponseDto = storeService.updateStoreTerritory(username, storeId,
+        User user = ((UserDetailsImpl) userDetails).getUser();
+        StoreResponseDto storeResponseDto = storeService.updateStoreTerritory(user, storeId,
             requestDto.categoryId());
 
         return CommonResponse.success(storeResponseDto);
@@ -142,8 +144,8 @@ public class StoreController {
         @RequestBody StoreUpdateTerritoryRequestDto requestDto,
         @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String username = userDetails.getUsername();
-        StoreResponseDto storeResponseDto = storeService.updateStoreTerritory(username, storeId,
+        User user = ((UserDetailsImpl) userDetails).getUser();
+        StoreResponseDto storeResponseDto = storeService.updateStoreTerritory(user, storeId,
             requestDto.territoryId());
 
         return CommonResponse.success(storeResponseDto);
@@ -158,8 +160,8 @@ public class StoreController {
         @PathVariable("id") UUID storeId,
         @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String username = userDetails.getUsername();
-        String deletedStoreId = storeService.deleteStore(username, storeId);
+        User user = ((UserDetailsImpl) userDetails).getUser();
+        String deletedStoreId = storeService.deleteStore(user, storeId);
         return CommonResponse.success(new StoreIdResponseDto(deletedStoreId));
     }
 
@@ -204,7 +206,6 @@ public class StoreController {
         @RequestParam(value = "all", defaultValue = "true") boolean hideNotPublic,
         @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable
     ) {
-        //
         List<ProductResponseDto> productListByStore = productService.findProductListByStore(id,
             hideNotPublic,
             pageable);

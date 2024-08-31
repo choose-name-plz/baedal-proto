@@ -10,6 +10,7 @@ import com.nameplz.baedal.domain.store.repository.StoreRepository;
 import com.nameplz.baedal.domain.territory.domain.Territory;
 import com.nameplz.baedal.domain.territory.repository.TerritoryRepository;
 import com.nameplz.baedal.domain.user.domain.User;
+import com.nameplz.baedal.domain.user.domain.UserRole;
 import com.nameplz.baedal.domain.user.repository.UserRepository;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
@@ -42,16 +43,16 @@ public class StoreService {
      */
     @Transactional
     public String createStore(String title, String description, String image, UUID territoryId,
-        UUID categoryId, String username) {
+        UUID categoryId, User user) {
 
-        User user = findUserByIdAndCheck(username);
+        User userInfo = findUserByIdAndCheck(user.getUsername());
         Territory territory = findTerritoryByIdAndCheck(territoryId);
         Category category = findCategoryByIdAndCheck(categoryId);
 
         // 유저를 가게 주인으로 변경
-        user.customerToOwner();
+        userInfo.customerToOwner();
 
-        Store store = Store.createStore(title, description, image, user, territory, category);
+        Store store = Store.createStore(title, description, image, userInfo, territory, category);
         storeRepository.save(store);
         return store.getId().toString();
     }
@@ -60,7 +61,7 @@ public class StoreService {
      * Store 업데이트
      */
     @Transactional
-    public StoreResponseDto updateStore(String username, UUID storeId, UUID territoryId,
+    public StoreResponseDto updateStore(User user, UUID storeId, UUID territoryId,
         UUID categoryId,
         String title, String description, String image, StoreStatus status) {
 
@@ -69,7 +70,7 @@ public class StoreService {
         Store store = findStoreByIdAndCheck(storeId);
 
         // 가게 주인인지 확인
-        checkStoreByUsername(username, store);
+        checkStoreByUsername(user, store);
 
         store.updateStore(title, description, image, status, territory, category);
         return storeMapper.storeToDto(store, store.getCategory().getName());
@@ -80,11 +81,11 @@ public class StoreService {
      * CLOSE, OPEN, PREPARING
      */
     @Transactional
-    public StoreResponseDto updateStoreStatus(String username, UUID storeId, StoreStatus status) {
+    public StoreResponseDto updateStoreStatus(User user, UUID storeId, StoreStatus status) {
         Store store = findStoreByIdAndCheck(storeId);
 
         // 가게 주인인지 확인
-        checkStoreByUsername(username, store);
+        checkStoreByUsername(user, store);
 
         store.updateStoreStatus(status);
         return storeMapper.storeToDto(store, store.getCategory().getName());
@@ -95,12 +96,12 @@ public class StoreService {
      * Store 카테고리 변경
      */
     @Transactional
-    public StoreResponseDto updateStoreCategory(String username, UUID storeId, UUID categoryId) {
+    public StoreResponseDto updateStoreCategory(User user, UUID storeId, UUID categoryId) {
         Category category = findCategoryByIdAndCheck(categoryId);
         Store store = findStoreByIdAndCheck(storeId);
 
         // 가게 주인인지 확인
-        checkStoreByUsername(username, store);
+        checkStoreByUsername(user, store);
         store.updateStoreCategory(category);
 
         return storeMapper.storeToDto(store, store.getCategory().getName());
@@ -110,12 +111,12 @@ public class StoreService {
      * Store 지역 변경
      */
     @Transactional
-    public StoreResponseDto updateStoreTerritory(String username, UUID storeId, UUID territoryId) {
+    public StoreResponseDto updateStoreTerritory(User user, UUID storeId, UUID territoryId) {
         Territory territory = findTerritoryByIdAndCheck(territoryId);
         Store store = findStoreByIdAndCheck(storeId);
 
         // 가게 주인인지 확인
-        checkStoreByUsername(username, store);
+        checkStoreByUsername(user, store);
 
         store.updateStoreTerritory(territory);
 
@@ -127,13 +128,13 @@ public class StoreService {
      * Store 삭제
      */
     @Transactional
-    public String deleteStore(String username, UUID storeId) {
+    public String deleteStore(User user, UUID storeId) {
         Store store = findStoreByIdAndCheck(storeId);
 
         // 가게 주인인지 확인
-        checkStoreByUsername(username, store);
-        
-        store.deleteEntity(username);
+        checkStoreByUsername(user, store);
+
+        store.deleteEntity(user.getUsername());
         return store.getId().toString();
     }
 
@@ -175,8 +176,13 @@ public class StoreService {
     /**
      * 가게 주인이 맞는지 확인한다.
      */
-    private void checkStoreByUsername(String username, Store store) {
-        if (!store.getUser().getUsername().equals(username)) {
+    private void checkStoreByUsername(User user, Store store) {
+        // 마스터면 허용
+        if (user.getRole().equals(UserRole.MASTER)) {
+            return;
+        }
+
+        if (!store.getUser().getUsername().equals(user.getUsername())) {
             throw new GlobalException(ResultCase.INVALID_INPUT);
         }
     }
