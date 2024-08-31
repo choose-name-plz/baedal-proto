@@ -122,7 +122,7 @@ public class WebSecurityConfig {
                 // 정적 파일
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 // Swagger UI
-                .requestMatcher("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/users/**").permitAll()
                 .requestMatchers("/admin/login").permitAll()
                 // 그 외
