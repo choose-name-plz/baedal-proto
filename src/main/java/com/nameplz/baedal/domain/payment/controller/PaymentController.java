@@ -4,8 +4,12 @@ import com.nameplz.baedal.domain.payment.dto.request.ChangePaymentStatusRequestD
 import com.nameplz.baedal.domain.payment.dto.request.CreatePaymentRequestDto;
 import com.nameplz.baedal.domain.payment.dto.response.PaymentResponseDto;
 import com.nameplz.baedal.domain.payment.service.PaymentService;
+import com.nameplz.baedal.domain.user.domain.User;
 import com.nameplz.baedal.global.common.response.CommonResponse;
 import com.nameplz.baedal.global.common.response.EmptyResponseDto;
+import com.nameplz.baedal.global.common.security.annotation.IsMaster;
+import com.nameplz.baedal.global.common.security.annotation.IsMasterOrSelf;
+import com.nameplz.baedal.global.common.security.annotation.LoginUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,11 +44,13 @@ public class PaymentController {
      * 결제 리스트 조회
      */
     @GetMapping
+    @IsMasterOrSelf
     public CommonResponse<List<PaymentResponseDto>> getPaymentList(
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @LoginUser User user
     ) {
 
-        List<PaymentResponseDto> response = paymentService.getPaymentList(pageable);
+        List<PaymentResponseDto> response = paymentService.getPaymentList(pageable, user);
 
         return CommonResponse.success(response);
     }
@@ -53,6 +59,7 @@ public class PaymentController {
      * 결제 생성
      */
     @PostMapping
+    @IsMaster
     public CommonResponse<PaymentResponseDto> createPayment(@Valid @RequestBody CreatePaymentRequestDto request) {
 
         PaymentResponseDto response = paymentService.createPayment(request);
@@ -64,12 +71,14 @@ public class PaymentController {
      * 결제 상태 변경
      */
     @PatchMapping("/{paymentId}/status")
+    @IsMaster
     public CommonResponse<EmptyResponseDto> updatePaymentStatus(
             @PathVariable UUID paymentId,
-            @RequestBody ChangePaymentStatusRequestDto request
+            @RequestBody ChangePaymentStatusRequestDto request,
+            @LoginUser User user
     ) {
 
-        paymentService.changePaymentStatus(paymentId, request);
+        paymentService.changePaymentStatus(paymentId, request, user);
 
         return CommonResponse.success();
     }
@@ -78,9 +87,13 @@ public class PaymentController {
      * 결제 삭제
      */
     @DeleteMapping("/{paymentId}")
-    public CommonResponse<EmptyResponseDto> deletePayment(@PathVariable UUID paymentId) {
+    @IsMaster
+    public CommonResponse<EmptyResponseDto> deletePayment(
+            @PathVariable UUID paymentId,
+            @LoginUser User user
+    ) {
 
-        paymentService.deletePayment(paymentId);
+        paymentService.deletePayment(paymentId, user);
 
         return CommonResponse.success();
     }
