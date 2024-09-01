@@ -7,6 +7,7 @@ import com.nameplz.baedal.domain.payment.dto.request.CreatePaymentRequestDto;
 import com.nameplz.baedal.domain.payment.dto.response.PaymentResponseDto;
 import com.nameplz.baedal.domain.payment.mapper.PaymentMapper;
 import com.nameplz.baedal.domain.payment.repository.PaymentRepository;
+import com.nameplz.baedal.domain.user.domain.User;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
 import lombok.RequiredArgsConstructor;
@@ -66,19 +67,18 @@ public class PaymentService {
      * 결제 상태 변경
      */
     @Transactional
-    public void changePaymentStatus(UUID paymentId, ChangePaymentStatusRequestDto request) {
+    public void changePaymentStatus(UUID paymentId, ChangePaymentStatusRequestDto request, User user) {
         Payment payment = findPayment(paymentId);
-        payment.changePaymentStatus(request.status());
+        payment.changePaymentStatus(request.status(), user.getUsername());
     }
 
     /**
      * 결제 삭제
      */
     @Transactional
-    public void deletePayment(UUID paymentId) {
+    public void deletePayment(UUID paymentId, User user) {
         Payment payment = findPayment(paymentId);
-        // TODO : 삭제한 사용자 정보를 넘겨줘야함
-        payment.deleteEntity(null);
+        payment.deleteEntity(user.getUsername());
     }
 
     private Payment findPayment(UUID paymentId) {
