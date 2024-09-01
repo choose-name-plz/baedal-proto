@@ -89,7 +89,7 @@ public class WebSecurityConfig {
         // 요청 URL 접근 설정
         settingRequestAuthorization(http);
 
-        // 필터 관리
+        // 로깅 -> authorization -> jwtauthentication -> username
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(new AuthenticationLoggingFilter(),
