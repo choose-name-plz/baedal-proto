@@ -41,10 +41,17 @@ public class OrderService {
     /**
      * 주문 단건 조회
      */
-    public OrderResponseDto getOrder(UUID orderId) {
-
+    public OrderResponseDto getOrder(UUID orderId, User user) {
         Order order = findOrder(orderId);
+        validateUserIsOrderer(order.getUser(), user);
+        
         return mapper.toOrderResponseDto(order);
+    }
+
+    private void validateUserIsOrderer(User order, User user) {
+        if (!order.getUsername().equals(user.getUsername())) {
+            throw new GlobalException(ResultCase.INVALID_INPUT);
+        }
     }
 
     /**
@@ -61,12 +68,21 @@ public class OrderService {
     /**
      * 특정 가게의 주문 목록 조회
      */
-    public List<OrderResponseDto> getOrderListByStoreId(UUID storeId, Pageable pageable) {
+    public List<OrderResponseDto> getOrderListByStoreId(UUID storeId, Pageable pageable, User user) {
+
+        Store store = findStoreById(storeId);
+        validateUserIsOwner(user, store);
 
         return orderRepository.findAllByStore_IdAndDeletedAtIsNull(storeId, pageable)
                 .stream()
                 .map(mapper::toOrderResponseDto)
                 .toList();
+    }
+
+    private void validateUserIsOwner(User user, Store store) {
+        if (!store.getUser().getUsername().equals(user.getUsername())) {
+            throw new GlobalException(ResultCase.INVALID_INPUT);
+        }
     }
 
     /**
@@ -76,7 +92,7 @@ public class OrderService {
     public OrderResponseDto createOrder(CreateOrderRequestDto requestDto, User user) {
 
         // 가게 가져오기
-        Store store = findStoreById(requestDto);
+        Store store = findStoreById(requestDto.storeId());
 
         // 주문 처리
         Order order = orderProcessService.process(requestDto, user, store, paymentService);
@@ -87,9 +103,9 @@ public class OrderService {
         return mapper.toOrderResponseDto(savedOrder);
     }
 
-    private Store findStoreById(CreateOrderRequestDto requestDto) {
+    private Store findStoreById(UUID storeId) {
 
-        return storeRepository.findByIdAndDeletedAtIsNull(requestDto.storeId())
+        return storeRepository.findByIdAndDeletedAtIsNull(storeId)
                 .orElseThrow(() -> new GlobalException(ResultCase.STORE_NOT_FOUND));
     }
 
