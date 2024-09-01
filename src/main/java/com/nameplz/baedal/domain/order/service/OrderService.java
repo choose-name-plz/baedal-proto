@@ -1,15 +1,14 @@
 package com.nameplz.baedal.domain.order.service;
 
-import com.nameplz.baedal.domain.model.Money;
 import com.nameplz.baedal.domain.order.domain.Order;
-import com.nameplz.baedal.domain.order.domain.OrderLine;
-import com.nameplz.baedal.domain.order.domain.OrderStatus;
 import com.nameplz.baedal.domain.order.dto.request.CreateOrderRequestDto;
 import com.nameplz.baedal.domain.order.dto.request.UpdateOrderStatusRequestDto;
 import com.nameplz.baedal.domain.order.dto.response.OrderResponseDto;
 import com.nameplz.baedal.domain.order.mapper.OrderMapper;
 import com.nameplz.baedal.domain.order.repository.OrderRepository;
+import com.nameplz.baedal.domain.payment.service.PaymentService;
 import com.nameplz.baedal.domain.store.domain.Store;
+import com.nameplz.baedal.domain.store.repository.StoreRepository;
 import com.nameplz.baedal.domain.user.domain.User;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
@@ -22,6 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 주문 응용 서비스
+ * 응용 서비스는 주로 도메인 객체 간 흐름 제어 및 트랜잭션 처리 등을 담당 (도메인 로직을 직접 구현하지 않음)
+ * 도메인 로직은 도메인 객체 및 서비스에 위임하고, 응용 서비스는 도메인 객체 간의 협력을 조정 (Facade 패턴)
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -30,6 +34,9 @@ public class OrderService {
 
     private final OrderMapper mapper;
     private final OrderRepository orderRepository;
+    private final OrderProcessService orderProcessService;
+    private final StoreRepository storeRepository;
+    private final PaymentService paymentService;
 
     /**
      * 주문 단건 조회
@@ -66,40 +73,24 @@ public class OrderService {
      * 주문 생성
      */
     @Transactional
-    public OrderResponseDto createOrder(CreateOrderRequestDto requestDto) {
+    public OrderResponseDto createOrder(CreateOrderRequestDto requestDto, User user) {
 
-        // TODO : 주문자 조회
-        // TODO : 가게 조회
+        // 가게 가져오기
+        Store store = findStoreById(requestDto);
 
-        Order order = createOrderEntity(requestDto, null, null);
-        addOrderLineListInOrder(requestDto, order);
+        // 주문 처리
+        Order order = orderProcessService.process(requestDto, user, store, paymentService);
 
+        // 주문 저장
         Order savedOrder = orderRepository.save(order);
 
         return mapper.toOrderResponseDto(savedOrder);
     }
 
-    private Order createOrderEntity(CreateOrderRequestDto requestDto, User user, Store store) {
+    private Store findStoreById(CreateOrderRequestDto requestDto) {
 
-        return Order.create(
-                OrderStatus.PAYMENT_WAITING,
-                requestDto.orderType(),
-                requestDto.comment(),
-                requestDto.address(),
-                user,
-                store
-        );
-    }
-
-    private void addOrderLineListInOrder(CreateOrderRequestDto request, Order order) {
-        request.orderLineList()
-                .stream()
-                .map(orderLineDto -> OrderLine.create(
-                        orderLineDto.quantity(),
-                        new Money(orderLineDto.price()),
-                        null,
-                        order))
-                .forEach(order::addOrderLine);
+        return storeRepository.findByIdAndDeletedAtIsNull(requestDto.storeId())
+                .orElseThrow(() -> new GlobalException(ResultCase.STORE_NOT_FOUND));
     }
 
     /**
