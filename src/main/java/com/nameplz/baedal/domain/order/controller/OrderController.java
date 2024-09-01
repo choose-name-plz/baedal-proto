@@ -4,15 +4,17 @@ import com.nameplz.baedal.domain.order.dto.request.CreateOrderRequestDto;
 import com.nameplz.baedal.domain.order.dto.request.UpdateOrderStatusRequestDto;
 import com.nameplz.baedal.domain.order.dto.response.OrderResponseDto;
 import com.nameplz.baedal.domain.order.service.OrderService;
+import com.nameplz.baedal.domain.user.domain.User;
 import com.nameplz.baedal.global.common.response.CommonResponse;
 import com.nameplz.baedal.global.common.response.EmptyResponseDto;
+import com.nameplz.baedal.global.common.security.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -69,8 +71,11 @@ public class OrderController {
      * 주문 생성
      */
     @PostMapping
-    public CommonResponse<OrderResponseDto> getOrderList(@Valid @RequestBody CreateOrderRequestDto request) {
-        OrderResponseDto response = orderService.createOrder(request);
+    public CommonResponse<OrderResponseDto> createOrder(
+            @Validated @RequestBody CreateOrderRequestDto request,
+            @LoginUser User user
+    ) {
+        OrderResponseDto response = orderService.createOrder(request, user);
 
         return CommonResponse.success(response);
     }
