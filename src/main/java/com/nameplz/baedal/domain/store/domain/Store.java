@@ -4,29 +4,16 @@ import com.nameplz.baedal.domain.category.domain.Category;
 import com.nameplz.baedal.domain.model.BaseEntity;
 import com.nameplz.baedal.domain.territory.domain.Territory;
 import com.nameplz.baedal.domain.user.domain.User;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "p_store")
@@ -69,8 +56,8 @@ public class Store extends BaseEntity {
     private List<Product> productList = new ArrayList<>();
 
     public static Store createStore(
-        String title, String description, String image, User user, Territory territory,
-        Category category) {
+            String title, String description, String image, User user, Territory territory,
+            Category category) {
         Store store = new Store();
         // 필드 값
         store.title = title;
@@ -98,8 +85,8 @@ public class Store extends BaseEntity {
      * 가게 업데이트
      */
     public void updateStore(String title, String description, String image, StoreStatus status,
-        Territory territory,
-        Category category) {
+                            Territory territory,
+                            Category category) {
         this.title = title;
         this.description = description;
         this.image = image;
@@ -127,5 +114,13 @@ public class Store extends BaseEntity {
      */
     public void updateStoreTerritory(Territory territory) {
         this.territory = territory;
+    }
+
+    /**
+     * 가게의 상품이 존재하는지 확인
+     */
+    public boolean hasProductList(List<UUID> orderedProductIdList) {
+        return productList.stream()
+                .allMatch(product -> orderedProductIdList.contains(product.getId()));
     }
 }
