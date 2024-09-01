@@ -52,7 +52,11 @@ public class PaymentService {
     @Transactional
     public PaymentResponseDto createPayment(CreatePaymentRequestDto request) {
 
-        Payment payment = Payment.create(new Money(request.amount()), request.paymentKey(), request.method(), request.status());
+        Payment payment = Payment.create(new Money(request.amount()), request.method(), request.username());
+
+        // 외부 결제 모듈에 결제 요청
+
+        payment.success();
         Payment savedPayment = paymentRepository.save(payment);
 
         return mapper.toPaymentResponseDto(savedPayment);
