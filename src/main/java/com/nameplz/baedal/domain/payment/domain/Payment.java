@@ -54,7 +54,16 @@ public class Payment extends BaseEntity {
         return payment;
     }
 
-    public void changePaymentStatus(PaymentStatus status) {
+    public void success() {
+        this.status = PaymentStatus.SUCCESS;
+    }
+
+    public void fail() {
+        this.status = PaymentStatus.FAILED;
+    }
+
+    public void changePaymentStatus(PaymentStatus status, String username) {
         this.status = status;
+        this.updatedUser = username;
     }
 }
