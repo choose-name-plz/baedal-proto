@@ -10,6 +10,8 @@ import com.nameplz.baedal.global.common.response.EmptyResponseDto;
 import com.nameplz.baedal.global.common.security.annotation.IsMaster;
 import com.nameplz.baedal.global.common.security.annotation.IsMasterOrSelf;
 import com.nameplz.baedal.global.common.security.annotation.LoginUser;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "결제")
 @RequestMapping("/payments")
 public class PaymentController {
 
@@ -33,6 +36,8 @@ public class PaymentController {
      * 결제 조회
      */
     @GetMapping("/{paymentId}")
+    @IsMaster
+    @Operation(summary = "결제 조회")
     public CommonResponse<PaymentResponseDto> getPayment(@PathVariable UUID paymentId) {
 
         PaymentResponseDto response = paymentService.getPayment(paymentId);
@@ -45,6 +50,7 @@ public class PaymentController {
      */
     @GetMapping
     @IsMasterOrSelf
+    @Operation(summary = "결제 리스트 조회")
     public CommonResponse<List<PaymentResponseDto>> getPaymentList(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @LoginUser User user
@@ -56,10 +62,11 @@ public class PaymentController {
     }
 
     /**
-     * 결제 생성
+     * 결제 처리
      */
     @PostMapping
     @IsMaster
+    @Operation(summary = "결제 처리")
     public CommonResponse<PaymentResponseDto> createPayment(@Valid @RequestBody CreatePaymentRequestDto request) {
 
         PaymentResponseDto response = paymentService.createPayment(request);
@@ -72,6 +79,7 @@ public class PaymentController {
      */
     @PatchMapping("/{paymentId}/status")
     @IsMaster
+    @Operation(summary = "결제 상태 변경")
     public CommonResponse<EmptyResponseDto> updatePaymentStatus(
             @PathVariable UUID paymentId,
             @RequestBody ChangePaymentStatusRequestDto request,
@@ -88,6 +96,7 @@ public class PaymentController {
      */
     @DeleteMapping("/{paymentId}")
     @IsMaster
+    @Operation(summary = "결제 삭제")
     public CommonResponse<EmptyResponseDto> deletePayment(
             @PathVariable UUID paymentId,
             @LoginUser User user
