@@ -7,6 +7,7 @@ import com.nameplz.baedal.domain.order.domain.OrderStatus;
 import com.nameplz.baedal.domain.order.dto.request.CreateOrderLineRequestDto;
 import com.nameplz.baedal.domain.order.dto.request.CreateOrderRequestDto;
 import com.nameplz.baedal.domain.order.dto.request.PaymentRequestDto;
+import com.nameplz.baedal.domain.order.event.OrderCreatedEvent;
 import com.nameplz.baedal.domain.payment.domain.PaymentStatus;
 import com.nameplz.baedal.domain.payment.dto.request.CreatePaymentRequestDto;
 import com.nameplz.baedal.domain.payment.dto.response.PaymentResponseDto;
@@ -15,6 +16,7 @@ import com.nameplz.baedal.domain.store.domain.Store;
 import com.nameplz.baedal.domain.user.domain.User;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
+import com.nameplz.baedal.global.config.event.Events;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,6 +47,9 @@ public class OrderProcessService {
         // 주문 생성
         Order order = createOrderEntity(requestDto, user, store);
         addOrderLineListInOrder(requestDto, order);
+
+        // 주문 생성 이벤트 발행
+        raiseOrderCreatedEvent(user, store, order);
 
         return order;
     }
@@ -94,5 +99,20 @@ public class OrderProcessService {
                         null,
                         order))
                 .forEach(order::addOrderLine);
+    }
+
+    private void raiseOrderCreatedEvent(User user, Store store, Order order) {
+
+        OrderCreatedEvent orderCreatedEvent = OrderCreatedEvent.of(
+                order.getId(),
+                user.getUsername(),
+                store.getId(),
+                order.getOrderStatus(),
+                order.getOrderType(),
+                order.getAddress(),
+                order.getComment()
+        );
+
+        Events.raise(orderCreatedEvent);
     }
 }
