@@ -7,7 +7,7 @@ import com.nameplz.baedal.domain.AiRequest.service.AiRequestService;
 import com.nameplz.baedal.domain.user.domain.UserRole.Authority;
 import com.nameplz.baedal.global.common.response.CommonResponse;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/users/ai-request")
+@RequiredArgsConstructor
 public class AiRequestController {
 
-    @Autowired
-    private AiRequestService aiRequestService;
+    private final AiRequestService aiRequestService;
 
     /**
      * AI를 통한 상품 설명 자동생성
