@@ -13,5 +13,6 @@ public interface ReviewMapper {
     @Mapping(target = "orderId", source = "order.id")
     @Mapping(target = "rating", source = "rating.score")
     @Mapping(target = "username", source = "user.username")
+    @Mapping(target = "isReported", source = "reported")
     ReviewResponseDto toReviewResponseDto(Review review);
 }
