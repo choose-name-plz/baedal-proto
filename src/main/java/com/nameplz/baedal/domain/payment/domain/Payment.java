@@ -54,8 +54,9 @@ public class Payment extends BaseEntity {
         return payment;
     }
 
-    public void success() {
+    public void success(String paymentKey) {
         this.status = PaymentStatus.SUCCESS;
+        this.paymentKey = paymentKey;
     }
 
     public void fail() {

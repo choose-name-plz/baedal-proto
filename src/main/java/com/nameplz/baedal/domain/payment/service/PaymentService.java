@@ -59,8 +59,9 @@ public class PaymentService {
         Payment payment = Payment.create(new Money(request.amount()), request.method(), request.username());
 
         // 외부 결제 모듈에 결제 요청
+        String paymentKey = UUID.randomUUID().toString();
 
-        payment.success();
+        payment.success(paymentKey);
         Payment savedPayment = paymentRepository.save(payment);
 
         return mapper.toPaymentResponseDto(savedPayment);
