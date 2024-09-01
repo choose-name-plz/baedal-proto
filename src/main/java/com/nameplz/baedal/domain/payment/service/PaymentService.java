@@ -13,6 +13,7 @@ import com.nameplz.baedal.global.common.response.ResultCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +39,10 @@ public class PaymentService {
 
     /**
      * 결제 리스트 조회
+     * 마스터 권한이 있거나 응답 리스트의 각 요소의 username이 현재 사용자의 username과 일치하는 요소만 포함
      */
-    public List<PaymentResponseDto> getPaymentList(Pageable pageable) {
+    @PostFilter("hasRole('ROLE_MASTER') or filterObject.username == #user.username")
+    public List<PaymentResponseDto> getPaymentList(Pageable pageable, User user) {
 
         return paymentRepository.findAllByDeletedAtIsNull(pageable)
                 .stream()
