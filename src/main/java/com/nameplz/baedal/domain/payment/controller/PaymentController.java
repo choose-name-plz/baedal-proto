@@ -52,11 +52,10 @@ public class PaymentController {
     @IsMasterOrSelf
     @Operation(summary = "결제 리스트 조회")
     public CommonResponse<List<PaymentResponseDto>> getPaymentList(
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-            @LoginUser User user
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
 
-        List<PaymentResponseDto> response = paymentService.getPaymentList(pageable, user);
+        List<PaymentResponseDto> response = paymentService.getPaymentList(pageable);
 
         return CommonResponse.success(response);
     }
