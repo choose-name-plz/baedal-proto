@@ -40,6 +40,8 @@ public enum ResultCase {
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, 3002, "주문을 찾을 수 없습니다."),
     // 주문 취소 불가 400
     ORDER_CANCEL_DENIED(HttpStatus.BAD_REQUEST, 3003, "주문을 취소할 수 없습니다."),
+    // 주문 실패 400
+    ORDER_FAILED(HttpStatus.BAD_REQUEST, 3004, "주문에 실패했습니다."),
 
     /* 결제 4000번대 */
 
