@@ -9,11 +9,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "p_store")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -112,5 +114,13 @@ public class Store extends BaseEntity {
      */
     public void updateStoreTerritory(Territory territory) {
         this.territory = territory;
+    }
+
+    /**
+     * 가게의 상품이 존재하는지 확인
+     */
+    public boolean hasProductList(List<UUID> orderedProductIdList) {
+        return productList.stream()
+                .allMatch(product -> orderedProductIdList.contains(product.getId()));
     }
 }

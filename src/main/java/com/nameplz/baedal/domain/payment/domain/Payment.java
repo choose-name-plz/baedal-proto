@@ -35,22 +35,36 @@ public class Payment extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
+    @Column(name = "username")
+    private String username;
+
     /**
      * 외부 결제 모듈의 결과를 저장
      */
-    public static Payment create(Money amount, String paymentKey, PaymentMethod method, PaymentStatus status) {
+    public static Payment create(Money amount, PaymentMethod method, String username) {
 
         Payment payment = new Payment();
 
         payment.amount = amount;
-        payment.paymentKey = paymentKey;
         payment.method = method;
-        payment.status = status;
+        payment.username = username;
+        payment.status = PaymentStatus.PENDING;
+        payment.createdUser = username;
 
         return payment;
     }
 
-    public void changePaymentStatus(PaymentStatus status) {
+    public void success(String paymentKey) {
+        this.status = PaymentStatus.SUCCESS;
+        this.paymentKey = paymentKey;
+    }
+
+    public void fail() {
+        this.status = PaymentStatus.FAILED;
+    }
+
+    public void changePaymentStatus(PaymentStatus status, String username) {
         this.status = status;
+        this.updatedUser = username;
     }
 }

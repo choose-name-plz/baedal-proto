@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ResultCase {
 
     /* 성공 0번대 - 모든 성공 응답을 200으로 통일 */
-    SUCCESS(HttpStatus.OK, 0, "정상 처리 되었습니다"),
+    SUCCESS(HttpStatus.OK, 0, "정상 처리 되었습니다."),
 
     /* 글로벌 1000번대 */
 
@@ -40,6 +40,8 @@ public enum ResultCase {
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, 3002, "주문을 찾을 수 없습니다."),
     // 주문 취소 불가 400
     ORDER_CANCEL_DENIED(HttpStatus.BAD_REQUEST, 3003, "주문을 취소할 수 없습니다."),
+    // 주문 실패 400
+    ORDER_FAILED(HttpStatus.BAD_REQUEST, 3004, "주문에 실패했습니다."),
 
     /* 결제 4000번대 */
 
