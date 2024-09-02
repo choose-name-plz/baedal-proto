@@ -64,8 +64,8 @@ public enum ResultCase {
     CATEGORY_IS_USED(HttpStatus.BAD_REQUEST, 6001, "이미 사용중인 카테고리입니다."),
     TERRITORY_IS_USED(HttpStatus.BAD_REQUEST, 6101, "이미 사용중인 지역정보입니다."),
 
-    ;
-
+    /* AI 7000번대 */
+    AIREQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, 7000, "AI 요청정보를 찾을 수 없습니다");
 
     private final HttpStatus httpStatus; // 응답 상태 코드
     private final Integer code; // 응답 코드. 도메인에 따라 1000번대로 나뉨
