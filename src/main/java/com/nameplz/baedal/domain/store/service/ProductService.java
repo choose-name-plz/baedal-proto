@@ -8,6 +8,8 @@ import com.nameplz.baedal.domain.store.dto.response.ProductResponseDto;
 import com.nameplz.baedal.domain.store.mapper.ProductMapper;
 import com.nameplz.baedal.domain.store.repository.ProductRepository;
 import com.nameplz.baedal.domain.store.repository.StoreRepository;
+import com.nameplz.baedal.domain.user.domain.User;
+import com.nameplz.baedal.domain.user.domain.UserRole;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
 import java.util.ArrayList;
@@ -35,12 +37,13 @@ public class ProductService {
      * Product 생성
      */
     @Transactional
-    public String createProduct(String username,
+    public String createProduct(User user,
         String name, String description, Integer price, String image, UUID storeId) {
 
-        Store store = findStoreById(storeId);
+        Store store = findStoreByIdAndCheck(storeId);
 
-        //TODO: Store에서 User가 같은지 확인한다.
+        // store에서 user가 같은지 확인한다.
+        checkStoreByUsername(user, store);
 
         Product product = Product.createProduct(name, description, price, image, store);
         productRepository.save(product);
@@ -52,13 +55,14 @@ public class ProductService {
      */
     @Transactional
     public List<ProductIdResponseDto> createProductBatch(
-        String username,
+        User user,
         List<ProductCreateRequestDto> productDtoList,
         UUID storeId) {
 
-        Store store = findStoreById(storeId);
+        Store store = findStoreByIdAndCheck(storeId);
 
-        //TODO: Store에서 User가 같은지 확인한다.
+        // store에서 user가 같은지 확인한다.
+        checkStoreByUsername(user, store);
 
         List<Product> productList = new ArrayList<>();
 
@@ -83,7 +87,7 @@ public class ProductService {
      */
     @Transactional
     public ProductResponseDto updateProduct(
-        String username,
+        User user,
         UUID productId,
         String name,
         String description,
@@ -92,7 +96,8 @@ public class ProductService {
     ) {
         Product product = findProductByIdAndCheck(productId);
 
-        //TODO: Store에서 User가 같은지 확인한다.
+        // store에서 user가 같은지 확인한다.
+        checkStoreByUsername(user, product.getStore());
 
         product.updateProduct(name, description, image);
         product.updateProductPublic(isPublic);
@@ -104,22 +109,26 @@ public class ProductService {
      * Product 공개 여부 변경
      */
     @Transactional
-    public ProductResponseDto updateProductStatus(UUID productId, boolean isPublic) {
+    public ProductResponseDto updateProductStatus(User user, UUID productId,
+        boolean isPublic) {
         Product product = findProductByIdAndCheck(productId);
 
-        //TODO: Store에서 User가 같은지 확인한다.
+        // fetch join을 할까
+        // store에서 user가 같은지 확인한다.
+        checkStoreByUsername(user, product.getStore());
 
         product.updateProductPublic(isPublic);
         return productMapper.productToDto(product);
     }
 
     @Transactional
-    public String deleteProduct(UUID productId, String username) {
+    public String deleteProduct(UUID productId, User user) {
         Product product = findProductByIdAndCheck(productId);
 
-        //TODO: Store에서 User가 같은지 확인한다.
+        // store에서 user가 같은지 확인한다.
+        checkStoreByUsername(user, product.getStore());
 
-        product.deleteEntity(username);
+        product.deleteEntity(user.getUsername());
         return product.getId().toString();
     }
 
@@ -153,7 +162,7 @@ public class ProductService {
         Pageable pageable) {
 
         // store가 존재하는 지 확인
-        findStoreById(storeId);
+        findStoreByIdAndCheck(storeId);
 
         List<Product> productList = productRepository.findProductListByStoreId(
             storeId, hideNotPublic, pageable);
@@ -167,9 +176,22 @@ public class ProductService {
     }
 
     /**
+     * 가게 주인이 맞는지 확인한다.
+     */
+    private void checkStoreByUsername(User user, Store store) {
+        // 마스터면 프리패스
+        if (user.getRole().equals(UserRole.MASTER)) {
+            return;
+        }
+        if (!store.getUser().getUsername().equals(user.getUsername())) {
+            throw new GlobalException(ResultCase.INVALID_INPUT);
+        }
+    }
+
+    /**
      * Id 별로 있는지 확인 후 불러오는 함수 모음
      */
-    private Store findStoreById(UUID storeId) {
+    private Store findStoreByIdAndCheck(UUID storeId) {
         return storeRepository.findByIdAndDeletedAtIsNull(storeId)
             .orElseThrow(() -> new GlobalException(
                 ResultCase.STORE_NOT_FOUND));

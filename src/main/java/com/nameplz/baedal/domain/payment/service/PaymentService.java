@@ -7,6 +7,7 @@ import com.nameplz.baedal.domain.payment.dto.request.CreatePaymentRequestDto;
 import com.nameplz.baedal.domain.payment.dto.response.PaymentResponseDto;
 import com.nameplz.baedal.domain.payment.mapper.PaymentMapper;
 import com.nameplz.baedal.domain.payment.repository.PaymentRepository;
+import com.nameplz.baedal.domain.user.domain.User;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class PaymentService {
 
     private final PaymentMapper mapper;
     private final PaymentRepository paymentRepository;
+    private final PaymentRequestService paymentRequestService;
 
     /**
      * 결제 조회
@@ -37,6 +39,7 @@ public class PaymentService {
 
     /**
      * 결제 리스트 조회
+     * 마스터 권한이 있거나 응답 리스트의 각 요소의 username이 현재 사용자의 username과 일치하는 요소만 포함
      */
     public List<PaymentResponseDto> getPaymentList(Pageable pageable) {
 
@@ -52,7 +55,11 @@ public class PaymentService {
     @Transactional
     public PaymentResponseDto createPayment(CreatePaymentRequestDto request) {
 
-        Payment payment = Payment.create(new Money(request.amount()), request.paymentKey(), request.method(), request.status());
+        Payment payment = Payment.create(new Money(request.amount()), request.method(), request.username());
+
+        // 외부 결제 모듈에 결제 요청
+        paymentRequestService.requestPayment(payment);
+
         Payment savedPayment = paymentRepository.save(payment);
 
         return mapper.toPaymentResponseDto(savedPayment);
@@ -62,19 +69,18 @@ public class PaymentService {
      * 결제 상태 변경
      */
     @Transactional
-    public void changePaymentStatus(UUID paymentId, ChangePaymentStatusRequestDto request) {
+    public void changePaymentStatus(UUID paymentId, ChangePaymentStatusRequestDto request, User user) {
         Payment payment = findPayment(paymentId);
-        payment.changePaymentStatus(request.status());
+        payment.changePaymentStatus(request.status(), user.getUsername());
     }
 
     /**
      * 결제 삭제
      */
     @Transactional
-    public void deletePayment(UUID paymentId) {
+    public void deletePayment(UUID paymentId, User user) {
         Payment payment = findPayment(paymentId);
-        // TODO : 삭제한 사용자 정보를 넘겨줘야함
-        payment.deleteEntity(null);
+        payment.deleteEntity(user.getUsername());
     }
 
     private Payment findPayment(UUID paymentId) {
