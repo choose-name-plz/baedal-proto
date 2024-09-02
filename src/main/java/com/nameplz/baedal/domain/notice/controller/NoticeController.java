@@ -4,6 +4,7 @@ import com.nameplz.baedal.domain.notice.dto.response.NoticeListResponseDto;
 import com.nameplz.baedal.domain.notice.dto.response.NoticeResponseDto;
 import com.nameplz.baedal.domain.notice.service.NoticeService;
 import com.nameplz.baedal.global.common.response.CommonResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "공지사항")
 @RequiredArgsConstructor
 @RequestMapping("notice")
 @RestController
