@@ -37,7 +37,6 @@ public class ReviewService {
      */
     public ReviewResponseDto getReviewByOrderIdWithoutDeleted(UUID orderId) {
         Review review = reviewRepository.findByOrderIdWithoutDeleted(orderId);
-        System.out.println(review.getRating());
         return mapper.toReviewResponseDto(review);
     }
 
@@ -92,9 +91,7 @@ public class ReviewService {
     public ReviewResponseDto createReview(CreateReviewRequestDto request, String username,
         UUID orderId) {
 
-        // TODO : 유저 가져오기
         User user = findUserByIdAndCheck(username);
-        // TODO : 주문 가져오기
         Order order = findOrderByIdAndCheck(orderId);
 
         Review review = Review.create(
