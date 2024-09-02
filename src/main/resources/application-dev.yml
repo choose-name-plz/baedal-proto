@@ -6,9 +6,9 @@ spring:
     password: 1234
   data:
     redis:
-      host: localhost
+      host: 172.17.129.27 # 도커 IP
       port: 6379
-      username: default
+      #      username: default
       password:
   jpa:
     hibernate:

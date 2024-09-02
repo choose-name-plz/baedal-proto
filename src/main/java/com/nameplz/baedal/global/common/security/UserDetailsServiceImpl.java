@@ -1,6 +1,7 @@
 package com.nameplz.baedal.global.common.security;
 
 import com.nameplz.baedal.domain.user.domain.User;
+import com.nameplz.baedal.domain.user.domain.UserDto;
 import com.nameplz.baedal.domain.user.repository.UserRepository;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
@@ -25,26 +26,24 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        // redis 에서 해당 유저 조회
-        UserDetailsImpl userDetails = (UserDetailsImpl) redisTemplate.opsForValue().get(username);
-        log.info("인메모리 에서 조회한 user " + userDetails.toString());
+        // redis 에서 캐싱해온 user 정보
+        UserDto userDTO = (UserDto) redisTemplate.opsForValue().get(username);
+        log.info("캐시된 User = {}", userDTO);
 
-        if (userDetails == null) {
-            // redis 에 없다면 DB에서 조회
+        // 캐시 데이터가 없으면 DB 조회후 캐싱
+        if (userDTO == null) {
             User user = userRepository.findById(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Not Found " + username));
 
-            log.info("RDBMS 에서 조회한 user " + user.toString());
+            userDTO = new UserDto(user.getUsername(), user.getPassword(), user.getRole());
 
-            // UserDetailsImpl 객체 생성
-            userDetails = new UserDetailsImpl(user);
-
-            // Redis에 캐싱, 만료 시간 1시간 설정
-            redisTemplate.opsForValue().set(username, userDetails, 1, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(username, userDTO, 1, TimeUnit.HOURS);
         }
 
-        return userDetails;
+        // UserDetailsImpl 을 반환해 authentication 객체를 SecurityContext에 저장
+        return new UserDetailsImpl(User.create(userDTO.username(), userDTO.password()));
     }
+
 
     /**
      * 권한 업데이트시 캐시 삭제 (UserDetailService 에서 처리하여 캐시 관리 책임을 집중화시킴)

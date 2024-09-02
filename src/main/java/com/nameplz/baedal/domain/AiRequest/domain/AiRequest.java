@@ -43,7 +43,7 @@ public class AiRequest extends BaseEntity {
         AiRequest aiRequest = new AiRequest();
 
         // request 데이터가 있고 공백이 아니면 Entity 에 저장
-        if (!requestText.isEmpty() && !requestText.isBlank()) {
+        if (!requestText.isBlank()) {
             aiRequest.requestContent = requestText;
         }
         aiRequest.user = user;

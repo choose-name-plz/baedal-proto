@@ -15,7 +15,6 @@ import com.nameplz.baedal.global.common.security.UserDetailsServiceImpl;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -102,14 +101,13 @@ public class UserService {
     /**
      * 회원정보 전체검색
      */
-    // TODO : java 17에서는 .collect(Collectors.toList()); 부분을 toList();로 줄여서 사용가능합니다!
     // TODO : 컨트롤러 단에서 Pageable 을 받아서 바로 처리할 수 있습니다!
     // import org.springframework.data.domain.Pageable; 입니다!
     public List<UserUpdateResponseDto> getAllUsers(int page, int size, String sortBy) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortBy).descending());
         return userRepository.findAll(pageRequest).stream()
             .map(userMapper::userToUserUpdateResponseDto)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**
