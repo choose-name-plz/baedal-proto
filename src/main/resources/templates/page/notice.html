@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>주문 관리</title>
+  <link href="/css/list-styles.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <!-- 페이지 제목 -->
+  <header class="page-header">
+    <h1>주문 관리</h1>
+    <div class="breadcrumb">
+      <a href="/admin">홈으로</a>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="table-controls">
+      <div class="add-box">
+        <label for="noticeInput">공지 추가:</label>
+        <input id="noticeInput" placeholder="공지를 입력하세요" type="text">
+        <button onclick="addNotice(document.getElementById('noticeInput').value)"> 공지 추가
+        </button>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+      <tr>
+        <th>Id</th>
+        <th>공지 내용</th>
+        <th>생성 날짜</th>
+        <th>공지 상태 변경</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="notice, stat : ${list}">
+        <td th:text="${notice.id}">1</td>
+        <td th:text="${notice.content}">공지 내용</td>
+        <td th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd HH:mm')}">2024-08-08</td>
+        <td th:if="${!notice.checkPublic}">
+          <button class="cd-button"
+                  th:noticeId="${notice.id}"
+                  th:onclick="changeNoticeStatus(this.getAttribute('noticeId'))">공지 활성화
+          </button>
+        </td>
+        <td th:if="${notice.checkPublic}">
+          <button class="d-button"
+                  th:noticeId="${notice.id}"
+                  th:onclick="changeNoticeStatus(this.getAttribute('noticeId'))">공지 비활성화
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+  function addNotice(noticeContent) {
+    if (!noticeContent) {
+            alert('공지를 입력하세요.');
+            return;
+    }
+
+    fetch('/admin/notice', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content: noticeContent }),
+            redirect: "follow"
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error('네트워크 응답이 올바르지 않습니다: ' + response.statusText);
+            }
+
+            return response.json();
+        })
+  }
+
+  function changeNoticeStatus(noticeId) {
+    if (!noticeId) {
+            alert('입력이 잘못되었습니다.');
+            return;
+    }
+
+    fetch(`/admin/notice/${noticeId}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            // controller 값에 따라서 redirect
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error('네트워크 응답이 올바르지 않습니다: ' + response.statusText);
+            }
+
+            return response.json();
+        })
+  }
+</script>
+</body>
+</html>
