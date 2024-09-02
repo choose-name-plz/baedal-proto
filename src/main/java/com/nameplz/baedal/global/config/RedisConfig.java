@@ -37,6 +37,7 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 
+        // Redis 연결 설정
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 
         // Serializer 설정

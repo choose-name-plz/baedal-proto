@@ -1,6 +1,7 @@
 package com.nameplz.baedal.domain.user.service;
 
 import com.nameplz.baedal.domain.user.domain.User;
+import com.nameplz.baedal.domain.user.domain.UserRole;
 import com.nameplz.baedal.domain.user.dto.request.UserSignupRequestDto;
 import com.nameplz.baedal.domain.user.dto.request.UserUpdateRequestDto;
 import com.nameplz.baedal.domain.user.dto.request.UserUpdateRoleRequestDto;
@@ -10,6 +11,7 @@ import com.nameplz.baedal.domain.user.mapper.UserMapper;
 import com.nameplz.baedal.domain.user.repository.UserRepository;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
+import com.nameplz.baedal.global.common.security.UserDetailsServiceImpl;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -27,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final UserDetailsServiceImpl userDetailsService;
 
     /**
      * 회원가입
@@ -116,10 +119,14 @@ public class UserService {
     public UserUpdateResponseDto updateUserRole(String username, UserUpdateRoleRequestDto request) {
         User user = userRepository.findById(username)
             .orElseThrow(() -> new GlobalException(ResultCase.USER_NOT_FOUND));
-        // TODO : 수정필요
-        //user.setRole(User.RoleType.valueOf(request.getRole().toUpperCase()));
 
+        // 권한 업데이트
+        user.updateRole(UserRole.valueOf(request.role()));
         userRepository.save(user);
+
+        // Redis 캐시에서 사용자 정보 삭제
+        userDetailsService.removeUserFromCache(username);
+
         return userMapper.userToUserUpdateResponseDto(user);
     }
 }
