@@ -9,7 +9,8 @@ public record CommunityResponseDto(String communityId, String reportUser, String
     public static CommunityResponseDto CommunityToResponseDto(Community community) {
         return new CommunityResponseDto(community.getId().toString(),
             community.getReportUser().getUsername(),
-            community.getCommentUser().getUsername(), community.getReportContent(),
+            community.getCommentUser() == null ? null : community.getCommentUser().getUsername(),
+            community.getReportContent(),
             community.getAnswerContent());
     }
 
