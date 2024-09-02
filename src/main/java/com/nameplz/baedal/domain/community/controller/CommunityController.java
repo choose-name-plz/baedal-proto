@@ -11,6 +11,7 @@ import com.nameplz.baedal.global.common.response.CommonResponse;
 import com.nameplz.baedal.global.common.security.annotation.IsMaster;
 import com.nameplz.baedal.global.common.security.annotation.IsMasterOrCustomer;
 import com.nameplz.baedal.global.common.security.annotation.LoginUser;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "고객센터")
 @RequiredArgsConstructor
 @RequestMapping("community")
 @RestController
