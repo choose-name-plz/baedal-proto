@@ -2,15 +2,8 @@ package com.nameplz.baedal.domain.user.domain;
 
 import com.nameplz.baedal.domain.model.BaseEntity;
 import com.nameplz.baedal.domain.user.dto.request.UserUpdateRequestDto;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -38,7 +31,6 @@ public class User extends BaseEntity {
     @Column(name = "is_public")
     private boolean isPublic;
 
-    // 회원가입 메서드
     public static User create(String username, String password) {
 
         User user = new User();
@@ -62,6 +54,13 @@ public class User extends BaseEntity {
     // 비밀번호 업데이트 메서드
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    // 일반 유저를 가게 주인으로 변경
+    public void customerToOwner() {
+        if (role.equals(UserRole.CUSTOMER)) {
+            role = UserRole.OWNER;
+        }
     }
 
     // 회원권한 변경 메서드

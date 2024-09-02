@@ -38,13 +38,13 @@
         <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">2024-08-08</td>
         <td th:if="${!#strings.equals(user.role, 'MASTER')}">
           <button class="d-button"
-                  th:onclick="restoreCategory(this.getAttribute('username'))"
+                  th:onclick="changeRole(this.getAttribute('username'), 'MASTER')"
                   th:username="${user.username}">마스터로
           </button>
         </td>
         <td th:if="${#strings.equals(user.role, 'MASTER')}">
           <button class="cd-button"
-                  th:onclick="deleteCategory(this.getAttribute('username'))"
+                  th:onclick="changeRole(this.getAttribute('username'), 'CUSTOMER')"
                   th:username="${user.username}">일반 유저로
           </button>
         </td>
@@ -54,17 +54,18 @@
   </div>
 </div>
 <script>
-  function deleteCategory(id) {
-    if (!confirm('정말 삭제하시겠습니까?')) {
+  function changeRole(id, role) {
+    if (!confirm('정말 변경하시겠습니까?')) {
         return;
     }
 
     // API 호출
-    fetch('/category/' + id, {
-        method: 'DELETE',
+    fetch('/users/' + id + '/status', {
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({ role: role })
     })
     .then(response => {
         if (!response.ok) {
@@ -73,42 +74,12 @@
         return response.json();
     })
     .then(data => {
-        console.log('삭제 성공:', data);
 
         location.reload(true);
     })
     .catch(error => {
         console.error('삭제 중 오류 발생:', error);
         alert('삭제에 실패했습니다. 다시 시도해주세요.');
-    });
-  }
-
-  function restoreCategory(id) {
-    if (!confirm('정말 삭제를 취소하시겠습니까?')) {
-        return;
-    }
-
-    // API 호출
-    fetch('/category/' + id + '/delete-cancel', {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('네트워크 응답이 올바르지 않습니다: ' + response.statusText);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('취소 성공:', data);
-
-        location.reload(true);
-    })
-    .catch(error => {
-        console.error('삭제 취소 중 오류 발생:', error);
-        alert('삭제 취소에 실패했습니다. 다시 시도해주세요.');
     });
   }
 

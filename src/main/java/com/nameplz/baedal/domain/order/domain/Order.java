@@ -98,7 +98,6 @@ public class Order extends BaseEntity {
      * 주문 상태 변경 - 가게주인과 관리자만 가능
      */
     public void updateOrderStatus(OrderStatus orderStatus) {
-        // TODO : 권환 확인 필요
         this.orderStatus = orderStatus;
     }
 
