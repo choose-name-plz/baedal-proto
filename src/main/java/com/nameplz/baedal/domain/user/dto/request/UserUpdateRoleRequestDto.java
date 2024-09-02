@@ -1,5 +1,9 @@
 package com.nameplz.baedal.domain.user.dto.request;
 
-public record UserUpdateRoleRequestDto (
-    String role
-){}
+import com.nameplz.baedal.domain.user.domain.UserRole;
+
+public record UserUpdateRoleRequestDto(
+    UserRole role
+) {
+
+}

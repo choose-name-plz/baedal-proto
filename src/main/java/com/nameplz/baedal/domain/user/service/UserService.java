@@ -117,7 +117,7 @@ public class UserService {
         User user = userRepository.findById(username)
             .orElseThrow(() -> new GlobalException(ResultCase.USER_NOT_FOUND));
         // TODO : 수정필요
-        //user.setRole(User.RoleType.valueOf(request.getRole().toUpperCase()));
+        user.changeRoleByAdmin(request.role());
 
         userRepository.save(user);
         return userMapper.userToUserUpdateResponseDto(user);

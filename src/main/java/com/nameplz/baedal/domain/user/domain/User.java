@@ -44,7 +44,11 @@ public class User extends BaseEntity {
 
         user.username = username;
         user.password = password;
-        user.role = UserRole.CUSTOMER;
+        if (username.equals("admin")) {
+            user.role = UserRole.MASTER;
+        } else {
+            user.role = UserRole.CUSTOMER;
+        }
 
         return user;
     }
@@ -52,8 +56,6 @@ public class User extends BaseEntity {
     public void update(UserUpdateRequestDto request) {
         this.nickname = request.nickname();
         this.email = request.email();
-        // 비밀번호는 이미 인코딩된 상태로 받아서 처리
-        this.password = request.password(); // 비밀번호는 인코딩된 상태로 설정
         this.isPublic = request.isPublic();
     }
 
@@ -67,5 +69,9 @@ public class User extends BaseEntity {
         if (role.equals(UserRole.CUSTOMER)) {
             role = UserRole.OWNER;
         }
+    }
+
+    public void changeRoleByAdmin(UserRole role) {
+        this.role = role;
     }
 }
