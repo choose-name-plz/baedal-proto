@@ -7,9 +7,12 @@ import com.nameplz.baedal.domain.user.dto.request.UserUpdateRoleRequestDto;
 import com.nameplz.baedal.domain.user.dto.response.UserUpdateResponseDto;
 import com.nameplz.baedal.domain.user.service.UserService;
 import com.nameplz.baedal.global.common.exception.GlobalException;
+import com.nameplz.baedal.global.common.jwt.JwtUtil;
 import com.nameplz.baedal.global.common.response.CommonResponse;
 import com.nameplz.baedal.global.common.response.EmptyResponseDto;
 import com.nameplz.baedal.global.common.response.ResultCase;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +52,11 @@ public class UserController {
     // TODO :로그아웃 (Spring Security에서 기본적으로 Stateless 설정으로 인해 로그아웃 기능은 필요하지 않지만, 추가적으로 구현할 수 있다?)
     // TODO : JWT 특성상 서버에서 제어권이 없기 때문에 로그아웃을 구현할 수 없지만, 서버에 로그아웃된 JWT를 블랙리스트로 저장해두고 이후 동일한 토큰으로 요청 시 로그인이 필요하다고 응답하는 식으로 구현하면 됩니다. 로그인 시에는 블랙리스트가 있는지 확인 후 있으면 삭제해주는 식으로요!
     @PostMapping("/logout")
-    public CommonResponse<EmptyResponseDto> logout() {
+    public CommonResponse<EmptyResponseDto> logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        response.addCookie(cookie);
         SecurityContextHolder.clearContext();
         return CommonResponse.success();
     }
@@ -71,8 +78,10 @@ public class UserController {
     // TODO : 에러 반환 시 try catch 안 쓰셔도 됩니다. throw new GlobalException 하면 GlobalExceptionHandler가 잡아줍니다
     // TODO : 추가로 SYSTEM_ERROR는 상태코드가 500 이라서 최후의 보루로 쓰셔야 합니다. 회원정보 수정이면 요청자가 잘못하여 예외가 발생할 확률이 매우 높으니 구체적으로 400대 에러를 반환해야합니다.
     @PutMapping("/{username}")
-    public CommonResponse<UserUpdateResponseDto> updateUser(@PathVariable String username,
+    public CommonResponse<UserUpdateResponseDto> updateUser(
+        @PathVariable String username,
         @RequestBody UserUpdateRequestDto updateUserRequest) {
+
         try {
             UserUpdateResponseDto userUpdateResponseDto = userService.updateUser(username,
                 updateUserRequest);

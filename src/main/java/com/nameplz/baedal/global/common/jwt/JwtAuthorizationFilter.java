@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,9 +29,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     // 로그인을 제외한 요청마다 필터실행. jwt에 담긴 정보를 추출해 authentication 객체에 저장
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res,
-                                    FilterChain filterChain) throws ServletException, IOException {
+        FilterChain filterChain) throws ServletException, IOException {
 
         String tokenValue = jwtUtil.getTokenFromRequest(req);
+
+        if (req.getRequestURI().equals("/users/logout")) {
+            filterChain.doFilter(req, res);
+        }
 
         if (StringUtils.hasText(tokenValue)) {
             // JWT 토큰 substring (Bearer 빼고 순수한토큰)
@@ -69,6 +74,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private Authentication createAuthentication(String username) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         return new UsernamePasswordAuthenticationToken(userDetails, null,
-                userDetails.getAuthorities());
+            userDetails.getAuthorities());
     }
 }
