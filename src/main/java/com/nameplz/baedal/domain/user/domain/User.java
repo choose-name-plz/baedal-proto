@@ -49,6 +49,7 @@ public class User extends BaseEntity {
         return user;
     }
 
+    // 회원정보 수정 메서드
     public void update(UserUpdateRequestDto request) {
         this.nickname = request.nickname();
         this.email = request.email();
@@ -60,6 +61,11 @@ public class User extends BaseEntity {
     // 비밀번호 업데이트 메서드
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    // 회원권한 변경 메서드
+    public void updateRole(UserRole role) {
+        this.role = role;
     }
 
     // 일반 유저를 가게 주인으로 변경

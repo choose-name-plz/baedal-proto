@@ -3,6 +3,7 @@ package com.nameplz.baedal.global.common.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nameplz.baedal.domain.user.domain.UserRole;
 import com.nameplz.baedal.domain.user.dto.request.UserLoginRequestDto;
+import com.nameplz.baedal.global.common.response.CommonResponse;
 import com.nameplz.baedal.global.common.security.UserDetailsImpl;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
@@ -10,9 +11,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -65,9 +68,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         jwtUtil.addJwtToCookie(token, response);
 
         // 로그인 결과 화면 보여주기
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"message\": \"로그인 성공\", \"token\": \"" + token + "\"}");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        CommonResponse.success("로그인 성공"); // TODO : dto 만들어 토큰까지 담을수도 있음
     }
 
     @Override

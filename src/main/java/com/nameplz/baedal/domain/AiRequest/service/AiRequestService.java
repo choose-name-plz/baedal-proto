@@ -86,6 +86,7 @@ public class AiRequestService {
         String url = apiUrl + "?key=" + apiKey;
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
+        // TODO : httpHeaders.setContentType(MediaType.APPLICATION_JSON); 컨텐츠 타입의 경우 이렇게 따로 setter가 마련되어 있습니다!
 
         HttpEntity<AiRequestDto> requestEntity = new HttpEntity<>(aiRequestDto, headers);
 
