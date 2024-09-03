@@ -1,20 +1,21 @@
 package com.nameplz.baedal.domain.review.repository;
 
+import static com.nameplz.baedal.domain.review.domain.QReview.review;
+
 import com.nameplz.baedal.domain.review.domain.Review;
+import com.nameplz.baedal.domain.review.repository.dto.ReviewScoreWithStoreDto;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import static com.nameplz.baedal.domain.review.domain.QReview.review;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @RequiredArgsConstructor
 public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
@@ -28,9 +29,9 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     public Review findByOrderIdWithoutDeleted(UUID orderId) {
 
         return query
-                .selectFrom(review)
-                .where(isReviewNotDeleted(), isOrderIdEqualTo(orderId), isOrderNotDeleted())
-                .fetchOne();
+            .selectFrom(review)
+            .where(isReviewNotDeleted(), isOrderIdEqualTo(orderId), isOrderNotDeleted())
+            .fetchOne();
     }
 
     private BooleanExpression isOrderIdEqualTo(UUID orderId) {
@@ -44,12 +45,12 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     public List<Review> findAllByUsernameWithoutDeleted(String username, Pageable pageable) {
 
         JPAQuery<Review> jpaQuery = query
-                .selectFrom(review)
-                .leftJoin(review.user)
-                .fetchJoin()
-                .where(isReviewNotDeleted(), isUserNotDeleted(), isUsernameEqualTo(username))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize());
+            .selectFrom(review)
+            .leftJoin(review.user)
+            .fetchJoin()
+            .where(isReviewNotDeleted(), isUserNotDeleted(), isUsernameEqualTo(username))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize());
 
         pageable.getSort().forEach(order -> jpaQuery.orderBy(createOrderSpecifier(order)));
 
@@ -66,24 +67,39 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     @Override
     public List<Review> findAllByStoreIdWithoutDeleted(UUID storeId, Pageable pageable) {
 
-
         JPAQuery<Review> jpaQuery = query
-                .selectFrom(review)
-                .leftJoin(review.order.store)
-                .fetchJoin()
-                .where(
-                        isReviewNotDeleted(),
-                        isStoreNotDeleted(),
-                        isReportedFalse(),
-                        isStoreIdEqualTo(storeId)
-                )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize());
+            .selectFrom(review)
+            .leftJoin(review.order.store)
+//            .fetchJoin()
+            .where(
+                isReviewNotDeleted(),
+                isStoreNotDeleted(),
+                isReportedFalse(),
+                isStoreIdEqualTo(storeId)
+            )
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize());
 
         pageable.getSort().forEach(order -> jpaQuery.orderBy(createOrderSpecifier(order)));
 
         return jpaQuery.fetch();
     }
+
+
+    public List<ReviewScoreWithStoreDto> findScoreByStoreIds(List<UUID> storeIds) {
+        return query.select(
+                Projections.constructor(ReviewScoreWithStoreDto.class, review.order.store.id,
+                    review.rating.score.avg()))
+            .from(review)
+            .leftJoin(review.order)
+            .where(
+                review.order.store.id.in(storeIds)
+            )
+            .groupBy(review.order.store.id).fetch();
+
+    }
+
+    ;
 
     private BooleanExpression isReportedFalse() {
         return review.isReported.isFalse();
@@ -94,8 +110,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     }
 
     /**
-     * 생성일, 수정일 기준으로 정렬 조건을 생성
-     * 기본값은 생성일 내림차순
+     * 생성일, 수정일 기준으로 정렬 조건을 생성 기본값은 생성일 내림차순
      */
     private OrderSpecifier<LocalDateTime> createOrderSpecifier(Sort.Order order) {
 

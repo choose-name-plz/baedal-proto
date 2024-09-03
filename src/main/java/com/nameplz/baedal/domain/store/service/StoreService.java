@@ -2,6 +2,8 @@ package com.nameplz.baedal.domain.store.service;
 
 import com.nameplz.baedal.domain.category.domain.Category;
 import com.nameplz.baedal.domain.category.repository.CategoryRepository;
+import com.nameplz.baedal.domain.review.repository.ReviewRepository;
+import com.nameplz.baedal.domain.review.repository.dto.ReviewScoreWithStoreDto;
 import com.nameplz.baedal.domain.store.domain.Store;
 import com.nameplz.baedal.domain.store.domain.StoreStatus;
 import com.nameplz.baedal.domain.store.dto.response.StoreResponseDto;
@@ -15,7 +17,9 @@ import com.nameplz.baedal.domain.user.repository.UserRepository;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +38,13 @@ public class StoreService {
     private final UserRepository userRepository;
     private final TerritoryRepository territoryRepository;
     private final CategoryRepository categoryRepository;
+    private final ReviewRepository reviewRepository;
 
     // mapper
     private final StoreMapper storeMapper;
+
+    // 조회 이외에는 점수를 넘겨주지 않는다.
+    private final Double DEFAULT_SCORE = 0.0;
 
     /**
      * Store 생성
@@ -73,7 +81,7 @@ public class StoreService {
         checkStoreByUsername(user, store);
 
         store.updateStore(title, description, image, status, territory, category);
-        return storeMapper.storeToDto(store, store.getCategory().getName());
+        return storeMapper.storeToDto(store, store.getCategory().getName(), DEFAULT_SCORE);
     }
 
     /*
@@ -88,9 +96,8 @@ public class StoreService {
         checkStoreByUsername(user, store);
 
         store.updateStoreStatus(status);
-        return storeMapper.storeToDto(store, store.getCategory().getName());
+        return storeMapper.storeToDto(store, store.getCategory().getName(), DEFAULT_SCORE);
     }
-
 
     /**
      * Store 카테고리 변경
@@ -104,7 +111,7 @@ public class StoreService {
         checkStoreByUsername(user, store);
         store.updateStoreCategory(category);
 
-        return storeMapper.storeToDto(store, store.getCategory().getName());
+        return storeMapper.storeToDto(store, store.getCategory().getName(), DEFAULT_SCORE);
     }
 
     /**
@@ -120,9 +127,8 @@ public class StoreService {
 
         store.updateStoreTerritory(territory);
 
-        return storeMapper.storeToDto(store, store.getCategory().getName());
+        return storeMapper.storeToDto(store, store.getCategory().getName(), DEFAULT_SCORE);
     }
-
 
     /**
      * Store 삭제
@@ -144,7 +150,13 @@ public class StoreService {
     public StoreResponseDto findStoreById(UUID storeId) {
         Store store = findStoreByIdAndCheck(storeId);
 
-        return storeMapper.storeToDto(store, store.getCategory().getName());
+        List<Store> storeList = new ArrayList<>();
+        storeList.add(store);
+        Map<UUID, Double> storeIdAndScoreMapping = findScoreFromStoreId(storeList);
+
+        return storeMapper.storeToDto(store, store.getCategory().getName(),
+            storeIdAndScoreMapping.getOrDefault(store.getId(), DEFAULT_SCORE
+            ));
     }
 
     /**
@@ -162,12 +174,15 @@ public class StoreService {
         List<Store> storeList = storeRepository.findStoreList(title, categoryId, null, status,
             pageable);
 
+        Map<UUID, Double> storeIdAndScoreMapping = findScoreFromStoreId(storeList);
+
         List<StoreResponseDto> output = new ArrayList<>();
         for (Store store : storeList) {
             output.add(
                 new StoreResponseDto(store.getId().toString(), store.getTitle(),
                     store.getDescription(), store.getImage(), store.getStatus(),
-                    store.getCategory().getName(), store.getCreatedAt()));
+                    store.getCategory().getName(), store.getCreatedAt(),
+                    storeIdAndScoreMapping.getOrDefault(store.getId(), DEFAULT_SCORE)));
         }
 
         return output;
@@ -185,6 +200,24 @@ public class StoreService {
         if (!store.getUser().getUsername().equals(user.getUsername())) {
             throw new GlobalException(ResultCase.INVALID_INPUT);
         }
+    }
+
+    /**
+     * 평점을 갖고 오기 위한 함수
+     */
+    private Map<UUID, Double> findScoreFromStoreId(List<Store> storeList) {
+
+        List<UUID> storeIdList = storeList.stream().map(Store::getId).toList();
+        List<ReviewScoreWithStoreDto> reviewRateInStoreIds = reviewRepository.findScoreByStoreIds(
+            storeIdList);
+
+        Map<UUID, Double> output = new HashMap<>();
+        for (ReviewScoreWithStoreDto reviewRateInStoreId : reviewRateInStoreIds) {
+            System.out.println("점수는 " + reviewRateInStoreId.score());
+            output.put(reviewRateInStoreId.storeId(),
+                ((double) Math.round(reviewRateInStoreId.score() * 100)) / 100);
+        }
+        return output;
     }
 
     /**

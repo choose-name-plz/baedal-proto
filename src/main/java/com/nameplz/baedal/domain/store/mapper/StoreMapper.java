@@ -10,7 +10,7 @@ import org.mapstruct.Mapper;
 public interface StoreMapper {
 
 
-    StoreResponseDto storeToDto(Store store, String categoryName);
+    StoreResponseDto storeToDto(Store store, String categoryName, Double score);
 
 
 }

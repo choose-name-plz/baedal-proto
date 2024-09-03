@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public record StoreResponseDto(
     String id, String title, String description, String image, StoreStatus status,
-    String categoryName, LocalDateTime createdAt
+    String categoryName, LocalDateTime createdAt, Double score
 ) {
 
 }
