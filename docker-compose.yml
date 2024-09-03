@@ -1,0 +1,26 @@
+services:
+
+  database:
+    container_name: postgres-baedal
+    image: postgres:16.4
+    restart: always
+    ports:
+      - "15432:5432"
+    environment:
+      POSTGRES_DB: baedal
+      POSTGRES_USER: choose
+      POSTGRES_PASSWORD: 1234
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  cache:
+    container_name: redis-baedal
+    image: redis:alpine
+    ports:
+      - "63790:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:

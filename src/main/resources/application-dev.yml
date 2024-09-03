@@ -7,7 +7,7 @@ spring:
   data:
     redis:
       host: localhost
-      port: 6379
+      port: 63790
       username: default
       password:
   jpa:
@@ -20,6 +20,14 @@ spring:
         highlight_sql: true # SQL 문 색 부여
         use_sql_comments: true # 콘솔에 표시되는 쿼리문 위에 어떤 실행을 하려는지 HINT 표시
   #        generate_statistics: true # 쿼리수행 통계
+  docker:
+    compose:
+      lifecycle-management: start-and-stop # 스프링 실행 시 컴포즈 실행하고, 종료 시 함께 종료
+      start:
+        command: up
+      stop:
+        command: down
+        timeout: 1m
 
 jwt:
   secret:
