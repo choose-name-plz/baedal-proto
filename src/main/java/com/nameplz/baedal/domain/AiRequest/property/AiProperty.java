@@ -1,4 +1,4 @@
-package com.nameplz.baedal.global.config;
+package com.nameplz.baedal.domain.AiRequest.property;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
