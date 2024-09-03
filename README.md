@@ -4,6 +4,18 @@
 
 ---
 
+## 목차
+
+- [🐒 구성원](#-구성원)
+- [🐹 개발 환경](#-개발-환경)
+- [👻 상세 개발 환경](#-상세-개발-환경)
+- [🐰 프로젝트 상세](#-프로젝트-상세)
+- [🐳 ERD](#-erd)
+- [🐙 API docs](#-api-docs)
+- [🐬 인프라 구조](#-인프라-구조)
+- [🐠 실행 방법](#-실행-방법)
+- [🐊 발표 PPT 자료](#-발표-ppt-자료)
+
 ## 🐒 구성원
 
 | 이름                                         | 역할 분담                        |
@@ -46,6 +58,7 @@
 ### 도메인 주도 설계 (DDD) 일부 도입
 
 ![DDD-v3](./docs/aggregate-v3.png)
+
 총 10개의 애그리거트로 구성되어 있습니다.
 
 ## 🐳 ERD
@@ -57,4 +70,20 @@
 ## 🐙 API docs
 
 - [Swagger UI](https://app.swaggerhub.com/apis-docs/choose-name-plz/baedal-proto/0.0.1)
+
+## 🐬 인프라 구조
+
+![Infra](./docs/infra.png)
+
+## 🐠 실행 방법
+
+### 환경 변수 목록
+
+> AI_API_KEY={Gemini API Key}
+
+- 이것만 입력하면 Docker compose support 라이브러리가 있어서 스프링만 실행하면 됩니다.
+
+## 🐊 발표 PPT 자료
+
+- [Canva](https://www.canva.com/design/DAGPluXO22A/1D-FAsErLIMDBwZ5kdgrvg/view?utm_content=DAGPluXO22A&utm_campaign=designshare&utm_medium=link&utm_source=editor)
 
