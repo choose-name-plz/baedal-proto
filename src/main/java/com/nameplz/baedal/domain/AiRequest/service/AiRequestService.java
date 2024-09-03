@@ -11,10 +11,10 @@ import com.nameplz.baedal.domain.user.domain.User;
 import com.nameplz.baedal.domain.user.repository.UserRepository;
 import com.nameplz.baedal.global.common.exception.GlobalException;
 import com.nameplz.baedal.global.common.response.ResultCase;
+import com.nameplz.baedal.global.config.AiProperty;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -31,12 +31,7 @@ public class AiRequestService {
     private final AiRequestRepository aiRequestRepository;
     private final AiRequestMapper aiRequestMapper;
     private final RestTemplate restTemplate;
-
-    @Value("${ai.api.url}")
-    private String apiUrl;
-
-    @Value("${ai.api.key}")
-    private String apiKey;
+    private final AiProperty aiProperty;
 
     /**
      * AI를 통한 상품 설명 자동생성
@@ -83,7 +78,7 @@ public class AiRequestService {
     public String callAiApi(AiRequestDto aiRequestDto) throws JsonProcessingException {
 
         log.info("callAiApi 실행");
-        String url = apiUrl + "?key=" + apiKey;
+        String url = aiProperty.getUrlWithKey();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
