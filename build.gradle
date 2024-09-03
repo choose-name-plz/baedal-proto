@@ -71,6 +71,8 @@ dependencies {
     // thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+    // docker compose support
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 
     /* Test*/
 
