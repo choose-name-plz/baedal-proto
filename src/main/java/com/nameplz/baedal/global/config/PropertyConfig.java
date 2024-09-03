@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationPropertiesScan
+@ConfigurationPropertiesScan("com.nameplz.baedal")
 public class PropertyConfig {
 
 }
