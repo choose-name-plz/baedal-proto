@@ -213,7 +213,6 @@ public class StoreService {
 
         Map<UUID, Double> output = new HashMap<>();
         for (ReviewScoreWithStoreDto reviewRateInStoreId : reviewRateInStoreIds) {
-            System.out.println("점수는 " + reviewRateInStoreId.score());
             output.put(reviewRateInStoreId.storeId(),
                 ((double) Math.round(reviewRateInStoreId.score() * 100)) / 100);
         }
