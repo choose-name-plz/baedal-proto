@@ -1,6 +1,8 @@
 package com.nameplz.baedal.global.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.nameplz.baedal.global.common.redis.RedisProperty;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -10,25 +12,24 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
+@Slf4j
+@RequiredArgsConstructor
 @Configuration
 public class RedisConfig {
 
-    @Value("${spring.data.redis.host}")
-    private String host;
 
-    @Value("${spring.data.redis.port}")
-    private int port;
-
-    @Value("${spring.data.redis.password}")
-    private String password;
+    private final RedisProperty redisProperty;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
 
-        config.setHostName(host);
-        config.setPort(port);
-        config.setPassword(password);
+        // log.info("호스트 : {}, 포트 : {}, 비밀번호 : {}", redisProperty.host(), redisProperty.port(),
+        //     redisProperty.password());
+
+        config.setHostName(redisProperty.host());
+        config.setPort(redisProperty.port());
+        config.setPassword(redisProperty.password());
 
         return new LettuceConnectionFactory(config);
     }
