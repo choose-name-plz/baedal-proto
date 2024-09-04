@@ -90,6 +90,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         // User 정보가 없으면 DB에서 갖고 온다.
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        // 인증에 성공하였으면 redis에 저장
+        redisUtils.setUserData(username, ((UserDetailsImpl) userDetails).getUser().getRole());
         return new UsernamePasswordAuthenticationToken(userDetails, null,
             userDetails.getAuthorities());
     }

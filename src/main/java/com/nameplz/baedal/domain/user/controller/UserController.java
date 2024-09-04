@@ -59,7 +59,9 @@ public class UserController {
         HttpServletResponse response) {
 
         // 캐시를 지우는 함수
-        userService.logout(userDetails.getUsername());
+        if (userDetails != null) {
+            userService.logout(userDetails.getUsername());
+        }
 
         // 쿠키 삭제
         Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, null);
