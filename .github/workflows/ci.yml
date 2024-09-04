@@ -6,8 +6,13 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
     permissions:
       contents: read
       # 아래는 /publish-unit-test-result-action 의 권한 
