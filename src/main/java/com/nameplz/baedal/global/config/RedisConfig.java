@@ -1,6 +1,9 @@
 package com.nameplz.baedal.global.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.nameplz.baedal.global.common.redis.RedisProperty;
+import com.nameplz.baedal.global.common.redis.dto.UserAuthDto;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -10,25 +13,21 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
+@Slf4j
+@RequiredArgsConstructor
 @Configuration
 public class RedisConfig {
 
-    @Value("${spring.data.redis.host}")
-    private String host;
 
-    @Value("${spring.data.redis.port}")
-    private int port;
-
-    @Value("${spring.data.redis.password}")
-    private String password;
+    private final RedisProperty redisProperty;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
 
-        config.setHostName(host);
-        config.setPort(port);
-        config.setPassword(password);
+        config.setHostName(redisProperty.host());
+        config.setPort(redisProperty.port());
+        config.setPassword(redisProperty.password());
 
         return new LettuceConnectionFactory(config);
     }
@@ -36,6 +35,26 @@ public class RedisConfig {
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+
+        // Serializer 설정
+        redisTemplate.setKeySerializer(RedisSerializer.string());
+        redisTemplate.setValueSerializer(RedisSerializer.json());
+
+        // Hash Serializer 설정
+        redisTemplate.setHashKeySerializer(RedisSerializer.string());
+        redisTemplate.setHashValueSerializer(RedisSerializer.json());
+
+        return redisTemplate;
+    }
+
+    /**
+     * UserAuth용 Redis Template
+     */
+    @Bean
+    public RedisTemplate<String, UserAuthDto> userAuthDtoRedisTemplate() {
+        RedisTemplate<String, UserAuthDto> redisTemplate = new RedisTemplate<>();
 
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 

@@ -9,6 +9,7 @@ import com.nameplz.baedal.domain.user.dto.response.UserUpdateResponseDto;
 import com.nameplz.baedal.domain.user.mapper.UserMapper;
 import com.nameplz.baedal.domain.user.repository.UserRepository;
 import com.nameplz.baedal.global.common.exception.GlobalException;
+import com.nameplz.baedal.global.common.redis.RedisUtils;
 import com.nameplz.baedal.global.common.response.ResultCase;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -27,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final RedisUtils redisUtils;
 
     /**
      * 회원가입
@@ -82,6 +84,9 @@ public class UserService {
         user.update(request); // 여기서는 비밀번호 인코딩이 완료된 DTO를 그대로 사용
         userRepository.save(user);
 
+        // 레디스에서 삭제
+        redisUtils.deleteUserData(username);
+
         return userMapper.userToUserUpdateResponseDto(user);
     }
 
@@ -94,6 +99,18 @@ public class UserService {
         User user = userRepository.findById(username)
             .orElseThrow(() -> new GlobalException(ResultCase.USER_NOT_FOUND));
         userRepository.delete(user);
+
+        // 레디스에서 삭제
+        redisUtils.deleteUserData(username);
+    }
+
+    /*
+     * 로그아웃 시 Redis를 지워주기 위한 부분
+     * Service에서만 주입받기 위함
+     */
+    public void logout(String username) {
+        // 레디스에서 삭제
+        redisUtils.deleteUserData(username);
     }
 
     /**
@@ -120,6 +137,9 @@ public class UserService {
         user.changeRoleByAdmin(request.role());
 
         userRepository.save(user);
+
+        // 레디스에서 삭제
+        redisUtils.deleteUserData(username);
         return userMapper.userToUserUpdateResponseDto(user);
     }
 }

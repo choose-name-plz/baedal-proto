@@ -3,6 +3,7 @@ package com.nameplz.baedal.global.common.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nameplz.baedal.domain.user.domain.UserRole;
 import com.nameplz.baedal.domain.user.dto.request.UserLoginRequestDto;
+import com.nameplz.baedal.global.common.redis.RedisUtils;
 import com.nameplz.baedal.global.common.security.UserDetailsImpl;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
@@ -23,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final JwtUtil jwtUtil;
+    private final RedisUtils redisUtils;
 
     @PostConstruct
     void setup() {
@@ -60,6 +62,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.info("로그인 성공 및 JWT 생성");
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getRole();
+
+        // 인증에 성공하였으면 redis에 저장
+        redisUtils.setUserData(username, role);
 
         String token = jwtUtil.createToken(username, role);
         jwtUtil.addJwtToCookie(token, response);
