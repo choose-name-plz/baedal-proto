@@ -15,7 +15,10 @@ import org.springframework.data.redis.core.ValueOperations;
 class RedisUtilsTest {
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, UserAuthDto> redisTemplate;
+
+    @Autowired
+    private RedisTemplate<String, Object> objectRedisTemplate;
 
     @Test
     void 레디스_저장_읽기_테스트() {
@@ -26,9 +29,9 @@ class RedisUtilsTest {
         UserAuthDto userAuthDto = UserAuthDto.of(username, role, LocalDateTime.now());
 
         // when
-        ValueOperations<String, Object> ops = redisTemplate.opsForValue();
+        ValueOperations<String, UserAuthDto> ops = redisTemplate.opsForValue();
         ops.set(username, userAuthDto, 1000 * 60, TimeUnit.MILLISECONDS);
-        UserAuthDto output = (UserAuthDto) ops.get(username);
+        UserAuthDto output = ops.get(username);
 
         // then
         Assertions.assertThat(output.username()).isEqualTo(username);
@@ -42,7 +45,7 @@ class RedisUtilsTest {
         String username = "yahoo";
         UserRole role = UserRole.MASTER;
         UserAuthDto userAuthDto = UserAuthDto.of(username, role, LocalDateTime.now());
-        ValueOperations<String, Object> ops = redisTemplate.opsForValue();
+        ValueOperations<String, Object> ops = objectRedisTemplate.opsForValue();
         ops.set(username, userAuthDto, 1000 * 60 * 60, TimeUnit.MILLISECONDS);
 
         // when

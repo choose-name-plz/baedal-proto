@@ -15,7 +15,7 @@ public class RedisUtils {
 
 
     private static final Long expiredTime = 1000 * 60 * 60L;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, UserAuthDto> redisTemplate;
 
     /**
      * Redis에 유저 정보 저장
@@ -23,7 +23,7 @@ public class RedisUtils {
     public void setUserData(String username, UserRole role) {
         UserAuthDto userAuthDto = UserAuthDto.of(username, role, LocalDateTime.now());
 
-        ValueOperations<String, Object> ops = redisTemplate.opsForValue();
+        ValueOperations<String, UserAuthDto> ops = redisTemplate.opsForValue();
         ops.set(username, userAuthDto, expiredTime, TimeUnit.MILLISECONDS);
     }
 
@@ -31,8 +31,8 @@ public class RedisUtils {
      *
      */
     public UserAuthDto findUserData(String username) {
-        ValueOperations<String, Object> ops = redisTemplate.opsForValue();
-        return (UserAuthDto) ops.get(username);
+        ValueOperations<String, UserAuthDto> ops = redisTemplate.opsForValue();
+        return ops.get(username);
     }
 
     public void deleteUserData(String username) {

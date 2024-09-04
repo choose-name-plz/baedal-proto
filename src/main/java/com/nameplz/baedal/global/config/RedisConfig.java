@@ -1,6 +1,7 @@
 package com.nameplz.baedal.global.config;
 
 import com.nameplz.baedal.global.common.redis.RedisProperty;
+import com.nameplz.baedal.global.common.redis.dto.UserAuthDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +35,26 @@ public class RedisConfig {
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+
+        // Serializer 설정
+        redisTemplate.setKeySerializer(RedisSerializer.string());
+        redisTemplate.setValueSerializer(RedisSerializer.json());
+
+        // Hash Serializer 설정
+        redisTemplate.setHashKeySerializer(RedisSerializer.string());
+        redisTemplate.setHashValueSerializer(RedisSerializer.json());
+
+        return redisTemplate;
+    }
+
+    /**
+     * UserAuth용 Redis Template
+     */
+    @Bean
+    public RedisTemplate<String, UserAuthDto> userAuthDtoRedisTemplate() {
+        RedisTemplate<String, UserAuthDto> redisTemplate = new RedisTemplate<>();
 
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 
