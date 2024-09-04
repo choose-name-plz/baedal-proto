@@ -31,6 +31,9 @@ dependencies {
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // redis에서 LocalDateTime 변환용
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
     // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
 

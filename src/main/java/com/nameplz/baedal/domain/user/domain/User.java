@@ -53,6 +53,17 @@ public class User extends BaseEntity {
         return user;
     }
 
+    /**
+     * Redis용 User 생성 => 별도 Principal을 생성하는 것이 좋아보임
+     */
+    public static User createForPrincipal(String username, UserRole role) {
+        User user = new User();
+        user.username = username;
+        user.role = role;
+
+        return user;
+    }
+
     public void update(UserUpdateRequestDto request) {
         this.nickname = request.nickname();
         this.email = request.email();

@@ -24,9 +24,6 @@ public class RedisConfig {
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
 
-        // log.info("호스트 : {}, 포트 : {}, 비밀번호 : {}", redisProperty.host(), redisProperty.port(),
-        //     redisProperty.password());
-
         config.setHostName(redisProperty.host());
         config.setPort(redisProperty.port());
         config.setPassword(redisProperty.password());
